@@ -7,6 +7,7 @@ function main () {
     let chatForm = document.getElementById('chat-form');
     let inputMsg = document.getElementById('m');
     let gameJoinBtn = document.getElementById('join-game');
+    let readyBtn = document.getElementById('btn-ready')
     let room = '';
     let status = '';
     
@@ -19,6 +20,10 @@ function main () {
 
     gameJoinBtn.addEventListener('click', function(event) {
         socket.emit('join game')
+    })
+
+    readyBtn.addEventListener('click', function(event) {
+        socket.emit('player-ready')
     })
     
     //add socket event handlers
@@ -34,5 +39,9 @@ function main () {
     socket.on('status-message', function(args) {
         console.log(args.message);
         room = args.room;
+    })
+
+    socket.on('error', function(error) {
+        window.alert(error)
     })
 };
