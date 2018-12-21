@@ -36,9 +36,18 @@ function main () {
         messages.appendChild(msgContainer);
     });
 
-    socket.on('status-message', function(args) {
-        console.log(args.message);
-        room = args.room;
+    socket.on('status-message', function(status) {
+        console.log(status)
+        switch (status) {
+            case 'starting': {
+                console.log('Game starting')
+            }
+            default: break
+        }
+    })
+
+    socket.on('dealt cards', function(cards) {
+        console.log(cards)
     })
 
     socket.on('error', function(error) {
