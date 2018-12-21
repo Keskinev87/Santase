@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+      .game-container{
+          border: 1px solid red;
+      }
+      .chat-container {
+          border: 1px solid blue;
+      }
+      .messages-container {
+          min-height: 100px;
+          max-height: 100px;
+          list-style: none;
+          padding: 0;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="game-container col-lg-10 col-md-10 col-sm-10 col-xs-12 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 text-center">
+        <div class="row">
+            <canvas id="myCanvas" width="600" height="400"></canvas>
+        </div>
+        <button type="button" class="btn btn-success" id="join-game">Play</button>
+    </div>
+    <div class="chat-container col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2">
+        <ul class="messages-container" id="messages">
+    
+        </ul>
+        <form class="text-center" id="chat-form" action="">
+            <div class="form-group">
+                <input type="text" class="form-control" autocomplete="off" id="m">
+            </div>
+            <button type="submit" class="btn btn-success">Send</button>
+        </form>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/scripts/main.js"></script>
+  </body>
+</html>
