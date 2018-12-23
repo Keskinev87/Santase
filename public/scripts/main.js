@@ -48,9 +48,59 @@ function main () {
 
     socket.on('dealt cards', function(cards) {
         console.log(cards)
+        dealCards(cards)
     })
 
     socket.on('error', function(error) {
         window.alert(error)
     })
+
+    function createCard(type, card) {
+        // <img id="home" src="img_trans.gif" width="1" height="1"><br><br></br>;
+        // width: 46px;
+        // height: 44px;
+        // background: url(img_navsprites.gif) 0 0;
+        // 80 x 117
+        if(type=='own') {
+            let newCard = document.createElement('img')
+            let posHor = (card.posHor-1) * -80 - (card.posHor - 1);
+            let posVer = (card.posVer-1) * -117;
+            let id = card.number + card.suit[0]
+            // let imgUrl = ;
+            // console.log(imgUrl)
+            // newCard.setAttribute('src', 'images/transparent.png');
+            newCard.classList.add('card');
+            newCard.setAttribute('draggable', 'true')
+            newCard.setAttribute('id', id)
+            newCard.ondragstart = drag(event)
+            newCard.style.background = 'url(images/cards.gif) ' + posHor + 'px ' + posVer + 'px';
+    
+            return newCard
+        } else if(type =="opponent") {
+            let newCard = document.createElement('img')
+            // let imgUrl = ;
+            // console.log(imgUrl)
+            // newCard.setAttribute('src', 'images/transparent.png');
+            newCard.classList.add('card');
+            newCard.style.background = 'url(images/card-back-1.jpg)'
+
+            return newCard;
+        }
+        
+    }
+
+    function dealCards(cards) {
+        let hand = document.getElementById('own-hand');
+        let opponentHand = document.getElementById('opponent-hand');
+        for (let card of cards) {
+            let cardEl = createCard('own', card);
+            let opponentCard = createCard('opponent');
+            opponentCard.style.background = 'url(images/card-back-1.png)';
+            hand.appendChild(cardEl);
+            opponentHand.appendChild(opponentCard);
+        }
+        // <img class="trump-card" style="background: url(images/card-back-1.png)"></img>
+
+    }
+
 };
