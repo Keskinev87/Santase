@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 
-app.use(express.static('public'));
+app.use(express.static('public'))
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
@@ -13,30 +13,30 @@ app.get('/', function(req, res){
 let roomCounter = 1;
 let activeRooms = [];
 let cards = [
-{number: 9, suit: "clubs", name: "Nine"},
-{number: 10, suit: "clubs", name: "Jack"},
-{number: 11, suit: "clubs", name: "Queen"},
-{number: 12, suit: "clubs", name: "King"},
-{number: 13, suit: "clubs", name: "Ten"},
-{number: 14, suit: "clubs", name: "Ace"},
-{number: 9, suit: "diamonds", name: "Nine"},
-{number: 10, suit: "diamonds", name: "Jack"},
-{number: 11, suit: "diamonds", name: "Queen"},
-{number: 12, suit: "diamonds", name: "King"},
-{number: 13, suit: "diamonds", name: "Ten"},
-{number: 14, suit: "diamonds", name: "Ace"},
-{number: 9, suit: "hearts", name: "Nine"},
-{number: 10, suit: "hearts", name: "Jack"},
-{number: 11, suit: "hearts", name: "Queen"},
-{number: 12, suit: "hearts", name: "King"},
-{number: 13, suit: "hearts", name: "Ten"},
-{number: 14, suit: "hearts", name: "Ace"},
-{number: 9, suit: "spades", name: "Nine"},
-{number: 10, suit: "spades", name: "Jack"},
-{number: 11, suit: "spades", name: "Queen"},
-{number: 12, suit: "spades", name: "King"},
-{number: 13, suit: "spades", name: "Ten"},
-{number: 14, suit: "spades", name: "Ace"}
+{posVer: 3, number: 9, suit: "clubs", name: "Nine", power: 0, posHor: 1},
+{posVer: 3, number: 10, suit: "clubs", name: "Jack", power: 2, posHor: 3},
+{posVer: 3, number: 11, suit: "clubs", name: "Queen", power: 3, posHor: 4},
+{posVer: 3, number: 12, suit: "clubs", name: "King", power: 4, posHor: 5},
+{posVer: 3, number: 13, suit: "clubs", name: "Ten", power: 10, posHor: 2},
+{posVer: 3, number: 14, suit: "clubs", name: "Ace", power: 11, posHor: 6},
+{posVer: 2, number: 9, suit: "diamonds", name: "Nine", power: 0, posHor: 1},
+{posVer: 2, number: 10, suit: "diamonds", name: "Jack", power: 2, posHor: 3},
+{posVer: 2, number: 11, suit: "diamonds", name: "Queen", power: 3, posHor: 4},
+{posVer: 2, number: 12, suit: "diamonds", name: "King", power: 4, posHor: 5},
+{posVer: 2, number: 13, suit: "diamonds", name: "Ten", power: 10, posHor: 2},
+{posVer: 2, number: 14, suit: "diamonds", name: "Ace", power: 11, posHor: 6},
+{posVer: 1, number: 9, suit: "hearts", name: "Nine", power: 0, posHor: 1},
+{posVer: 1, number: 10, suit: "hearts", name: "Jack", power: 2, posHor: 3},
+{posVer: 1, number: 11, suit: "hearts", name: "Queen", power: 3, posHor: 4},
+{posVer: 1, number: 12, suit: "hearts", name: "King", power: 4, posHor: 5},
+{posVer: 1, number: 13, suit: "hearts", name: "Ten", power: 10, posHor: 2},
+{posVer: 1, number: 14, suit: "hearts", name: "Ace", power: 11, posHor: 6},
+{posVer: 4, number: 9, suit: "spades", name: "Nine", power: 0, posHor: 1},
+{posVer: 4, number: 10, suit: "spades", name: "Jack", power: 2, posHor: 3},
+{posVer: 4, number: 11, suit: "spades", name: "Queen", power: 3, posHor: 4},
+{posVer: 4, number: 12, suit: "spades", name: "King", power: 4, posHor: 5},
+{posVer: 4, number: 13, suit: "spades", name: "Ten", power: 10, posHor: 2},
+{posVer: 4, number: 14, suit: "spades", name: "Ace", power: 11, posHor: 6}
 ]
 
 io.on('connection', function(socket){
@@ -53,7 +53,7 @@ io.on('connection', function(socket){
         points: 0,
         overallPoints: 0
     };
-    console.log('a user connected');
+    console.log('a user connected');   
     
     socket.on('join game', function() {
         if(Object.keys(socket.rooms).length <= 1) {

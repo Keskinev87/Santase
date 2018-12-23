@@ -9,9 +9,33 @@
     <style>
       .game-container{
           border: 1px solid red;
+          
       }
       .chat-container {
           border: 1px solid blue;
+      }
+      .play-scene {
+          border: 1px solid purple;
+          height: 400px;
+      }
+      .oponent-hand{
+        display:block;
+        border: 1px solid green;
+        height: 120px;
+        width: 100%;
+      }
+      .play-field {
+        position: relative;
+        display: block;
+        border: 1px solid green;
+        height: 160px;
+        width: 100%;
+      }
+      .own-hand {
+        display:block;
+        border: 1px solid green;
+        height: 120px;
+        width: 100%;
       }
       .messages-container {
           min-height: 100px;
@@ -19,16 +43,45 @@
           list-style: none;
           padding: 0;
       }
+      .card {
+          width: 80px;
+          height: 117px;
+          margin-left: -40px;
+      }
+      .trump-card {
+        width: 80px;
+        height: 117px;
+        -ms-transform: rotate(90deg); /* IE 9 */
+        -webkit-transform: rotate(90deg); /* Safari 3-8 */
+        transform: rotate(90deg);
+      }
+      #home {
+        width: 46px;
+        height: 44px;
+        background: url(img_navsprites.gif) 0 0;
+    }
 
     </style>
   </head>
   <body>
     <div class="game-container col-lg-10 col-md-10 col-sm-10 col-xs-12 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 text-center">
-        <div class="row">
-            <canvas id="myCanvas" width="600" height="400"></canvas>
+        <div class="play-scene">
+            <div class="oponent-hand" id="opponent-hand">
+               
+            </div>
+            <div class="play-field text-center" id="play-field" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <img src="images/card-back-1.png" draggable="true" ondragstart="drag(event)">
+                <img class="card" style="background: url(images/card-back-1.png)" draggable="true" ondragstart="drag(event)">
+            </div>
+            <div class="own-hand" id="own-hand">
+                
+            </div>
         </div>
-        <button type="button" class="btn btn-success" id="btn-ready">I am ready</button>
-        <button type="button" class="btn btn-success" id="join-game">Play</button>
+            
+        <div class="row controls-container">
+            <button type="button" class="btn btn-success" id="btn-ready">I am ready</button>
+            <button type="button" class="btn btn-success" id="join-game">Play</button>
+        </div>
     </div>
     <div class="chat-container col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2">
         <ul class="messages-container" id="messages">
@@ -44,5 +97,22 @@
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/main.js"></script>
+    <script>
+         function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+       ev.dataTransfer.setData("text", ev.target.id);
+       console.log("Dragging")
+        // ev.dataTransfer.setData("text", ev.target.id);
+    }
+  
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+    }
+    </script>
   </body>
 </html>
