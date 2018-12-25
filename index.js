@@ -73,15 +73,17 @@ io.on('connection', function(socket){
                             }
                           });
                 io.sockets.in(room).emit('chat message', 'The game will begin in 5 seconds...');
-                setTimeout(dealCards, 5000);
+                io.sockets.in(room).emit('room joined', room);
                 io.sockets.in(room).emit('status-message', 'starting');
+                setTimeout(dealCards, 5000);
+                
             } else {
                 room = "room-" + roomCounter;
-                let args = {room: room, message: 'Room created. Waiting for another player'}
                 //join the game
                 socket.join(room);
                 //emit status
-                io.sockets.in(room).emit('status-message', args);
+                io.sockets.in(room).emit('room joined', room)
+                io.sockets.in(room).emit('chat message', 'Waiting for another player');
                 //add the game to the active games
                 activeRooms.unshift(room);
                 //increase the counter
@@ -117,8 +119,8 @@ io.on('connection', function(socket){
         }
         console.log(player1)
         console.log(player2)
-        io.sockets.to(player1.id).emit('dealt cards', player1.cards)
-        io.sockets.to(player2.id).emit('dealt cards', player2.cards)
+        io.sockets.to(player1.id).emit('deal cards', player1.cards)
+        io.sockets.to(player2.id).emit('deal cards', player2.cards)
     }
     //both players are ready
     // socket.on('player-ready', function() {

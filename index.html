@@ -4,77 +4,25 @@
     <title>Socket.IO chat</title>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
     <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <style>
-      .game-container{
-          border: 1px solid red;
-          
-      }
-      .chat-container {
-          border: 1px solid blue;
-      }
-      .play-scene {
-          border: 1px solid purple;
-          height: 400px;
-      }
-      .oponent-hand{
-        display:block;
-        border: 1px solid green;
-        height: 120px;
-        width: 100%;
-      }
-      .play-field {
-        position: relative;
-        display: block;
-        border: 1px solid green;
-        height: 160px;
-        width: 100%;
-      }
-      .own-hand {
-        display:block;
-        border: 1px solid green;
-        height: 120px;
-        width: 100%;
-      }
-      .messages-container {
-          min-height: 100px;
-          max-height: 100px;
-          list-style: none;
-          padding: 0;
-      }
-      .card {
-          width: 80px;
-          height: 117px;
-          margin-left: -40px;
-      }
-      .trump-card {
-        width: 80px;
-        height: 117px;
-        -ms-transform: rotate(90deg); /* IE 9 */
-        -webkit-transform: rotate(90deg); /* Safari 3-8 */
-        transform: rotate(90deg);
-      }
-      #home {
-        width: 46px;
-        height: 44px;
-        background: url(img_navsprites.gif) 0 0;
-    }
-
-    </style>
   </head>
   <body>
     <div class="game-container col-lg-10 col-md-10 col-sm-10 col-xs-12 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 text-center">
         <div class="play-scene">
-            <div class="oponent-hand" id="opponent-hand">
-               
+            <div class="oponent-area" id="opponent-area">
+                <div id="opponent-hand">
+
+                </div>
             </div>
-            <div class="play-field text-center" id="play-field" ondrop="drop(event)" ondragover="allowDrop(event)">
-                <img src="images/card-back-1.png" draggable="true" ondragstart="drag(event)">
-                <img class="card" style="background: url(images/card-back-1.png)" draggable="true" ondragstart="drag(event)">
+            <div class="play-field text-center" id="play-field" >
+                <!-- <img class="card" src="images/transparent-1.png" style="background: url(images/card-back-1.png)"  draggable="true" id="test-card"> -->
             </div>
-            <div class="own-hand" id="own-hand">
-                
+            <div class="own-area" id="own-area">
+                <div id="own-hand">
+
+                </div>
             </div>
         </div>
             
@@ -97,22 +45,10 @@
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/main.js"></script>
+    <script src="/scripts/helpers.js"></script>
     <script>
-         function allowDrop(ev) {
-        ev.preventDefault();
-    }
+        
 
-    function drag(ev) {
-       ev.dataTransfer.setData("text", ev.target.id);
-       console.log("Dragging")
-        // ev.dataTransfer.setData("text", ev.target.id);
-    }
-  
-    function drop(ev) {
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("text");
-        ev.target.appendChild(document.getElementById(data));
-    }
     </script>
   </body>
 </html>

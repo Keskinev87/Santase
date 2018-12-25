@@ -3,15 +3,38 @@ window.onload = main;
 function main () {
     var socket = io();
 
-    //declare variables
-    let chatForm = document.getElementById('chat-form');
+    let chatForm = document.getElementById('chat-form'); //get the typed message
     let inputMsg = document.getElementById('m');
     let gameJoinBtn = document.getElementById('join-game');
     let readyBtn = document.getElementById('btn-ready')
+    let playField = document.getElementById('play-field')
     let room = '';
     let status = '';
     
-    //add event listeners
+    //                ADD EVENT LISTENERS TO THE ELEMENTS
+    
+    //Make cards dragable. The player will be able to drag it into the play area.
+    //Since the cards are generated dynamically, we implemented this with event delegation
+    document.addEventListener('dragstart',function(e){
+        if(e.target) {
+            console.log(e)
+            e.dataTransfer.setData("text", e.target.id);
+        }
+    })
+
+    //allow the card to be dragged over the play field
+    playField.addEventListener('dragover', allowDrop)
+
+    //allow the card to be dropped in the play field
+    playField.addEventListener('drop', drop)
+
+    //The other option for the users to play a card will be a doulbe click...
+    document.addEventListener('dblclick', function(e) {
+        if(e.target && e.target.classList.contains('card')) {
+            playCard(e.target.id);
+        }
+     })
+    
     chatForm.addEventListener('submit', function(event) {
         socket.emit('chat message', inputMsg.value);
         inputMsg.value='';
@@ -26,7 +49,8 @@ function main () {
         socket.emit('player-ready')
     })
     
-    //add socket event handlers
+    //           ADD SOCKET EVENT HANDLERS
+
     socket.on('chat message', function(msg){
         let messages = document.getElementById('messages');
         let message = document.createTextNode(msg);
@@ -35,6 +59,10 @@ function main () {
         msgContainer.appendChild(message);
         messages.appendChild(msgContainer);
     });
+
+    socket.on('room', function(assignedRoom){
+        room = assignedRoom;
+    })
 
     socket.on('status-message', function(status) {
         console.log(status)
@@ -46,7 +74,7 @@ function main () {
         }
     })
 
-    socket.on('dealt cards', function(cards) {
+    socket.on('deal cards', function(cards) {
         console.log(cards)
         dealCards(cards)
     })
@@ -55,6 +83,10 @@ function main () {
         window.alert(error)
     })
 
+    //             GAME FUNCTIONS
+
+
+    //creates the cards from the server array
     function createCard(type, card) {
         // <img id="home" src="img_trans.gif" width="1" height="1"><br><br></br>;
         // width: 46px;
@@ -68,11 +100,10 @@ function main () {
             let id = card.number + card.suit[0]
             // let imgUrl = ;
             // console.log(imgUrl)
-            // newCard.setAttribute('src', 'images/transparent.png');
+            newCard.setAttribute("src", "images/transparent-1.png");
             newCard.classList.add('card');
-            newCard.setAttribute('draggable', 'true')
-            newCard.setAttribute('id', id)
-            newCard.ondragstart = drag(event)
+            newCard.setAttribute('draggable', 'true');
+            newCard.setAttribute('id', id);
             newCard.style.background = 'url(images/cards.gif) ' + posHor + 'px ' + posVer + 'px';
     
             return newCard
@@ -82,25 +113,55 @@ function main () {
             // console.log(imgUrl)
             // newCard.setAttribute('src', 'images/transparent.png');
             newCard.classList.add('card');
-            newCard.style.background = 'url(images/card-back-1.jpg)'
+            newCard.style.background = 'url(images/card-back-1.png)'
 
             return newCard;
         }
         
     }
 
+    // deals the created cards to the player
+
     function dealCards(cards) {
-        let hand = document.getElementById('own-hand');
-        let opponentHand = document.getElementById('opponent-hand');
+        let hand = document.getElementById('own-hand'); //player's hand - the cards will be visible
+        let opponentHand = document.getElementById('opponent-hand'); //opponent's hand - cards will not be visible
+
         for (let card of cards) {
-            let cardEl = createCard('own', card);
-            let opponentCard = createCard('opponent');
-            opponentCard.style.background = 'url(images/card-back-1.png)';
-            hand.appendChild(cardEl);
-            opponentHand.appendChild(opponentCard);
+            let cardEl = createCard('own', card); //generate a visible card
+            let opponentCard = createCard('opponent'); //generate a card with a card-back
+
+            hand.appendChild(cardEl); //deal a visible card to the player
+            opponentHand.appendChild(opponentCard); //deal a card to the opponent
         }
         // <img class="trump-card" style="background: url(images/card-back-1.png)"></img>
-
     }
+
+    function disableHandTillOpponentPlays() {
+        let ownHand = document.getElementById('own-hand');
+        ownHand.classList.add('disabled-play');
+    }
+
+    function playCard(id) {
+        let card = document.getElementById(id);
+        let playField = document.getElementById('play-field');
+        
+        playField.appendChild(card);
+        disableHandTillOpponentPlays();
+        socket.emit('card played')
+    }
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+        console.log('preventing')
+    }
+    
+    function drop(ev) {
+        ev.preventDefault();
+        //the dataTransfer contains the id of the card which was dragged
+        let id = ev.dataTransfer.getData("text");
+        playCard(id);
+    }
+
+    
 
 };

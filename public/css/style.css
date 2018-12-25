@@ -1,0 +1,60 @@
+.game-container{
+    border: 1px solid red;
+    
+}
+.chat-container {
+    border: 1px solid blue;
+}
+.play-scene {
+    border: 1px solid purple;
+    height: 400px;
+}
+.oponent-area{
+  display:block;
+  border: 1px solid green;
+  height: 120px;
+  width: 100%;
+}
+.play-field {
+  position: relative;
+  display: block;
+  border: 1px solid green;
+  height: 160px;
+  width: 100%;
+}
+.own-area {
+  display:block;
+  border: 1px solid green;
+  height: 120px;
+  width: 100%;
+}
+.messages-container {
+    min-height: 100px;
+    max-height: 100px;
+    list-style: none;
+    padding: 0;
+}
+.card {
+    width: 80px;
+    height: 117px;
+    margin-left: -40px;
+    cursor: -webkit-grab;
+}
+
+.card.dragging {
+    cursor: -webkit-grabbing;
+}
+
+.trump-card {
+  width: 80px;
+  height: 117px;
+  -ms-transform: rotate(90deg); /* IE 9 */
+  -webkit-transform: rotate(90deg); /* Safari 3-8 */
+  transform: rotate(90deg);
+}
+
+.disabled-play {
+    pointer-events: none;
+    cursor: -webkit-wait;
+    opacity: 0.4;
+}
