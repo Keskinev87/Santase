@@ -53,34 +53,36 @@ io.on('connection', function(socket){
         points: 0,
         overallPoints: 0
     };
+    let nextMove = '';
     console.log('a user connected');   
     
     socket.on('join game', function() {
-        if(Object.keys(socket.rooms).length <= 1) {
+        if(Object.keys(socket.rooms).length <= 1) { //if the player is not in another room
             if(activeRooms.length > 0) {
-                //the first waiting room
-                room = activeRooms.pop()
-                //join the first waiting room
-                socket.join(room)
-                //emit information to the client
+                room = activeRooms.pop() //the first waiting room
+                socket.join(room) //join the first waiting room
+                
                 player2.id = socket.id;
                 io.sockets.in(room).emit('chat message', 'Player joined');
                     io.in(room).clients((error, clients) => {
                             if (error) {
-                                io.sockets.to(socket.id).emit('error', 'Player 1 left...')
+                                io.sockets.to(socket.id).emit('error', 'Connection to the room lost...')
                             } else {
                                 player1.id = clients[0];
                             }
                           });
                 io.sockets.in(room).emit('chat message', 'The game will begin in 5 seconds...');
                 io.sockets.in(room).emit('room joined', room);
+                
+                nextMove = 'player' + getRandBetween(1,2)
+                let data = {status: 'starting', nextMove: nextMove}
                 io.sockets.in(room).emit('status-message', 'starting');
+               
                 setTimeout(dealCards, 5000);
                 
             } else {
                 room = "room-" + roomCounter;
-                //join the game
-                socket.join(room);
+                socket.join(room); //join the game
                 //emit status
                 io.sockets.in(room).emit('room joined', room)
                 io.sockets.in(room).emit('chat message', 'Waiting for another player');
@@ -97,6 +99,11 @@ io.on('connection', function(socket){
         }
     });
 
+    socket.on('chat message', function(msg){
+        console.log('message: ' + msg);
+        io.sockets.to(room).emit('chat message', msg);
+    });
+
     function shuffleCards() {
         let newDeck = cards.slice()
         let playDeck = [];
@@ -108,7 +115,7 @@ io.on('connection', function(socket){
         return playDeck
     }
 
-    function dealCards() {
+    function dealCards() { 
         let playDeck = shuffleCards();
         for (let i = 0; i < 12; i++) {
             if(i % 2 == 1) {
@@ -122,6 +129,11 @@ io.on('connection', function(socket){
         io.sockets.to(player1.id).emit('deal cards', player1.cards)
         io.sockets.to(player2.id).emit('deal cards', player2.cards)
     }
+
+    function getRandBetween(min, max) {
+        return Math.floor(Math.random() * max) + min
+    }
+
     //both players are ready
     // socket.on('player-ready', function() {
     //     let socketRooms = Object.keys(socket.rooms)
@@ -132,10 +144,7 @@ io.on('connection', function(socket){
     //    
     // });
     //for chatting during the game
-    socket.on('chat message', function(msg){
-        console.log('message: ' + msg);
-        io.sockets.to(room).emit('chat message', msg);
-    });
+    
 });
 
 http.listen(3000, function(){

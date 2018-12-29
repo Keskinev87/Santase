@@ -9,6 +9,7 @@ function main () {
     let readyBtn = document.getElementById('btn-ready')
     let playField = document.getElementById('play-field')
     let room = '';
+    let myTurn = false;
     let status = '';
     
     //                ADD EVENT LISTENERS TO THE ELEMENTS
@@ -49,7 +50,7 @@ function main () {
         socket.emit('player-ready')
     })
     
-    //           ADD SOCKET EVENT HANDLERS
+    //             ADD SOCKET EVENT HANDLERS
 
     socket.on('chat message', function(msg){
         let messages = document.getElementById('messages');
@@ -88,18 +89,13 @@ function main () {
 
     //creates the cards from the server array
     function createCard(type, card) {
-        // <img id="home" src="img_trans.gif" width="1" height="1"><br><br></br>;
-        // width: 46px;
-        // height: 44px;
-        // background: url(img_navsprites.gif) 0 0;
-        // 80 x 117
+
         if(type=='own') {
             let newCard = document.createElement('img')
             let posHor = (card.posHor-1) * -80 - (card.posHor - 1);
             let posVer = (card.posVer-1) * -117;
             let id = card.number + card.suit[0]
-            // let imgUrl = ;
-            // console.log(imgUrl)
+
             newCard.setAttribute("src", "images/transparent-1.png");
             newCard.classList.add('card');
             newCard.setAttribute('draggable', 'true');
@@ -109,9 +105,7 @@ function main () {
             return newCard
         } else if(type =="opponent") {
             let newCard = document.createElement('img')
-            // let imgUrl = ;
-            // console.log(imgUrl)
-            // newCard.setAttribute('src', 'images/transparent.png');
+          
             newCard.classList.add('card');
             newCard.style.background = 'url(images/card-back-1.png)'
 
@@ -147,7 +141,7 @@ function main () {
         
         playField.appendChild(card);
         disableHandTillOpponentPlays();
-        socket.emit('card played')
+        socket.emit('card played', card)
     }
 
     function allowDrop(ev) {
