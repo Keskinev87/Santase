@@ -2,14 +2,10 @@
 <html>
   <head>
     <title>Socket.IO chat</title>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   </head>
   <body>
-    <div class="game-container col-lg-10 col-md-10 col-sm-10 col-xs-12 col-lg-offset-1 col-md-offset-1 col-sm-offset-1 text-center">
+    <div class="game-container">
         <div class="play-scene">
             <div class="oponent-area" id="opponent-area">
                 <div id="opponent-hand">
@@ -17,6 +13,12 @@
                 </div>
             </div>
             <div class="play-field text-center" id="play-field" >
+                <div id="play-arena">
+
+                </div>
+                <div id="card-pile">
+
+                </div>
                 <!-- <img class="card" src="images/transparent-1.png" style="background: url(images/card-back-1.png)"  draggable="true" id="test-card"> -->
             </div>
             <div class="own-area" id="own-area">
@@ -24,14 +26,15 @@
 
                 </div>
             </div>
+            <div class="row controls-container">
+                <button type="button" class="btn btn-success" id="btn-ready">I am ready</button>
+                <button type="button" class="btn btn-success" id="join-game">Play</button>
+            </div>
         </div>
             
-        <div class="row controls-container">
-            <button type="button" class="btn btn-success" id="btn-ready">I am ready</button>
-            <button type="button" class="btn btn-success" id="join-game">Play</button>
-        </div>
+        
     </div>
-    <div class="chat-container col-lg-8 col-md-8 col-sm-8 col-xs-12 col-lg-offset-2 col-md-offset-2 col-sm-offset-2">
+    <div class="chat-container">
         <ul class="messages-container" id="messages">
     
         </ul>
@@ -45,7 +48,10 @@
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/main.js"></script>
-    <script src="/scripts/helpers.js"></script>
+    <script src="/scripts/gameScene.js"></script>
+    <script src="/scripts/player.js"></script>
+    <script src="/scripts/opponent.js"></script>
+    <script src="/scripts/cards.js"></script>
     <script>
         
 
