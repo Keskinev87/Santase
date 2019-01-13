@@ -5,7 +5,9 @@ class GameScene {
         this.gameJoinBtn = document.getElementById('join-game');
         this.readyBtn = document.getElementById('btn-ready');
         this.playField = document.getElementById('play-field');
+        this.playArena = document.getElementById('play-arena');
         this.cardPile = document.getElementById('card-pile');
+        this.trumpSuit;
         this.room;
         this.myTurn = false;
         this.status = '';
@@ -39,15 +41,22 @@ class GameScene {
         })
     }
 
+    clearPlayArena() {
+        while (this.playArena.hasChildNodes()) {   
+            this.playArena.removeChild(this.playArena.firstChild);
+          }
+    }
+
     createCard(type, index, card) {
         return new Promise((resolve, reject) => {
             if(type=='own') {
                 let newCard = document.createElement('img');
-                let id = cards[card].number + cards[card].suit[0];
+                let id = card.number;
     
-                newCard.setAttribute("src", cards[card].image);
+                newCard.setAttribute("src", cards[card.number].image);
                 newCard.classList.add('card');
                 newCard.setAttribute('id', id);
+                newCard.setAttribute('data-pos', index);
                 newCard.style.left = index * 10 + '%';
                 newCard.style.top = '10%';
         
@@ -85,25 +94,31 @@ class GameScene {
 
     dealTrumpCard(card) {
         let trumpCard = document.createElement('img');
-        let id = card;
-        let width = this.hand.width * 0.2 + 'px';
-        let height = this.hand.height * 0.9 + 'px';
+        let id = card.number;
         trumpCard.setAttribute('id', id);
-        trumpCard.setAttribute('src', cards[card].image);
-        trumpCard.style.width = width;
-        trumpCard.style.height = height;
+        trumpCard.setAttribute('src', cards[card.number].image);
+       
         trumpCard.classList.add('trump-card');
 
         this.cardPile.appendChild(trumpCard);
+        this.trumpSuit = card.suit;
     }
 
-    disableOwnHand() {
-        //disables the player's hand (waiting for the opponent to play);
-        this.hand.classList.add('disabled-play');
+    dealPileCards() {
+        let pileCard = document.createElement('img');
+    
+        pileCard.setAttribute("src", cardback);
+        pileCard.classList.add('pile-card');
+        
+        this.cardPile.appendChild(pileCard);
     }
-
-    enableOwnHand() {
-        this.hand.classList.remove('disabled-play');
+    
+    showOpponentsCard(card) {
+        this.createCard('own', 0, card).then((oppCard) => {
+            oppCard.style.left = '20%';
+            oppCard.classList.add('played-card');
+            this.playArena.appendChild(oppCard);
+        })
     }
 
     displayChatMsg(msg) {

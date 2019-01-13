@@ -69,13 +69,15 @@
 }
 
 .messages-container {
+    top: 0;
+    height: 80%;
+    overflow: scroll;
     list-style: none;
 }
 
 .status-msg {
     color:blue;
 }
-
 
 .card {
     position: absolute;
@@ -89,13 +91,28 @@
 }
 
 .trump-card {
-  -ms-transform: rotate(90deg); /* IE 9 */
-  -webkit-transform: rotate(90deg); /* Safari 3-8 */
-  transform: rotate(90deg);
+    position: absolute;
+    left: 5%;
+    width: 40%;
+    height: 90%;
+  /* -ms-transform: rotate(90deg); 
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg); */
 }
 
-.disabled-play {
+.pile-card {
+    position: absolute;
+    left: 55%;
+    width: 40%;
+    height: 90%;
+}
+
+.disabled-hand { 
+    opacity: 0.5;
+}
+
+.disabled-card {
     pointer-events: none;
-    cursor: -webkit-wait;
-    opacity: 0.4;
+    cursor: not-allowed;
+    cursor: -webkit-not-allowed;
 }

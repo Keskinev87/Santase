@@ -16,30 +16,51 @@ function main () {
         });
 
         socket.on('status message', function(msg) {
-            gameScene.displayStatusMsg(msg)
+            gameScene.displayStatusMsg(msg);
         })
     
-        socket.on('room joined', function(assignedRoom){
-            gameScene.room = assignedRoom;
+        socket.on('room joined', function(data){
+            gameScene.room = data.roomNumber;
+            player.playerNumber = data.playerNumber;
         })
     
         socket.on('deal cards', function(cards) {
-            console.log(cards);
             gameScene.dealCards(cards);
         })
 
         socket.on('deal trump card', function(card) {
             gameScene.dealTrumpCard(card);
+            gameScene.dealPileCards();
         })
 
-        socket.on('play', function(msg){
-            gameScene.enableOwnHand();
-            gameScene.displayStatusMsg(msg);
+        socket.on('play', function(cardPlayed, stage){
+            player.enableOwnHand(cardPlayed, stage);
+            gameScene.displayStatusMsg("Your turn...");
         })
 
         socket.on('wait', function(msg){
-            gameScene.disableOwnHand();
-            gameScene.displayStatusMsg(msg);
+            player.disableOwnHand();
+            gameScene.displayStatusMsg("Waiting for the other player...");
+        })
+
+        socket.on('draw card', function(card) {
+            player.drawPileCard(card);
+        })
+
+        socket.on('opponent plays', function(card){
+            gameScene.showOpponentsCard(card);
+        })
+
+        socket.on('collect cards', function(){
+            player.collectCards();
+        })
+
+        socket.on('update points', function(points){
+            player.updatePoints(points)
+        })
+
+        socket.on('clear play area', function(){
+            gameScene.clearPlayArena();
         })
     
         socket.on('error', function(error) {
