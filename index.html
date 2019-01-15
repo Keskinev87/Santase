@@ -3,13 +3,18 @@
   <head>
     <title>Santase</title>
     <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   </head>
   <body>
     <div class="game-container" id="game-container">
         <div class="play-scene">
             <div class="oponent-area" id="opponent-area">
                 <div id="opponent-hand">
-
+                     
+                    <div id = "opponent-points">Points: <span id='opp-pts'>0</span></div>
+                </div>
+                <div id="opponent-pile">
+                    
                 </div>
             </div>
             <div class="play-field text-center" id="play-field" >
@@ -17,15 +22,16 @@
 
                 </div>
                 <div id="card-pile">
-
+                    
                 </div>
                 <!-- <img class="card" src="images/transparent-1.png" style="background: url(images/card-back-1.png)"  draggable="true" id="test-card"> -->
             </div>
             <div class="own-area" id="own-area">
                 <div id="own-hand">
-                    <div id="own-pile">
-
-                    </div>
+                   <div id="own-points">Points: <span id='own-pts'>0</span></div>
+                </div>
+                <div id="own-pile">
+                    
                 </div>
             </div>
             <div class="controls-container">
@@ -33,19 +39,19 @@
                 <button type="button" class="play-button" id="join-game">Play</button>
             </div>
         </div>
-        <div class="chat-container">
+        <div class="chat-container" id="chat-container">
             <ul class="messages-container" id="messages">
         
             </ul>
             <!-- <form class="text-center" id="chat-form" action="">
-                <div class="form-group">
-                    <input type="text" class="form-control" autocomplete="off" id="m">
-                </div>
-                <button type="submit" class="btn btn-success">Send</button>
+                
+                <input type="text" class="chat-input" autocomplete="off" id="m">
+                
+                <button type="submit" class="chat-send-btn">Send</button>
             </form> -->
         </div>
-        
     </div>
+    
     
     
     <script src="/socket.io/socket.io.js"></script>

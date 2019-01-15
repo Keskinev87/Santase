@@ -1,3 +1,9 @@
+@media screen and (max-width: 1000px) {
+    body {
+        font-size: 2.5vw;
+    }
+}
+
 .game-container{
     position: absolute;
     left:     50%;
@@ -18,6 +24,39 @@
   height: 30%;
   width: 100%;
 }
+
+#opponent-hand {
+    position: absolute;
+    border: 1px solid violet;
+    width: 70%;
+    height: 100%;
+    left: 0;
+}
+
+#opponent-pile {
+    position: absolute;
+    border: 1px solid black;
+    width: 30%;
+    left: 70%;
+    height: 100%;
+}
+
+#opponent-pile .pile-card {
+    position: absolute;
+    top: 10%;
+    width: 70%;
+    left: 15%;
+    height: auto;
+}
+
+#opponent-points {
+    position: absolute;
+    border: 1px solid grey;
+    top: 90%;
+    height: 10%;
+    width: 100%;
+}
+
 .play-field {
   position: absolute;
   border: 1px solid green;
@@ -50,6 +89,38 @@
   width: 100%;
 }
 
+#own-hand {
+    position: absolute;
+    border: 1px solid violet;
+    width: 70%;
+    height: 100%;
+    left: 0;
+}
+
+#own-pile {
+    position: absolute;
+    border: 1px solid black;
+    width: 30%;
+    left: 70%;
+    height: 100%;
+}
+
+#own-pile .pile-card {
+    position: absolute;
+    top: 10%;
+    width: 70%;
+    left: 15%;
+    height: auto;
+}
+
+#own-points {
+    position: absolute;
+    border: 1px solid grey;
+    bottom: 0;
+    height: 10%;
+    width: 100%;
+}
+
 .controls-container{
     position: absolute;
     border: 1px solid lime;
@@ -60,19 +131,34 @@
 
 .chat-container {
     border: 1px solid blue;
-   position: absolute;
-   top: 90%;
-   height: 10%;
-   width: 100%;
+    position: absolute;
+    top: 90%;
+    height: 10%;
+    width: 100%;
    padding: 0;
 }
 
 .messages-container {
+    position: absolute;
     top: 0;
     height: 80%;
-    overflow: hidden;
+    overflow-y: hidden;
     list-style: none;
 }
+
+#chat-form {
+    position: absolute;
+    top: 80%;
+    height: 20%;
+}
+
+/* .chat-input {
+    display: inline-block;
+}
+
+.chat-send-btn {
+    display: inline-block;
+} */
 
 .status-msg {
     color:blue;
@@ -80,7 +166,7 @@
 
 .card {
     position: absolute;
-    width: 20%;
+    width: 30%;
     height: auto;
     cursor: -webkit-grab;
 }
@@ -99,16 +185,18 @@
     position: absolute;
     left: 5%;
     width: 40%;
+    top:20%;
     height: auto;
   /* -ms-transform: rotate(90deg); 
   -webkit-transform: rotate(90deg);
   transform: rotate(90deg); */
 }
 
-.pile-card {
+.play-field .pile-card {
     position: absolute;
     left: 55%;
     width: 40%;
+    top: 20%;
     height: auto;
 }
 
