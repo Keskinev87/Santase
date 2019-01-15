@@ -7,6 +7,8 @@ class GameScene {
         this.playField = document.getElementById('play-field');
         this.playArena = document.getElementById('play-arena');
         this.cardPile = document.getElementById('card-pile');
+        this.opponentPile = document.getElementById('opponent-pile');
+        this.ownPile = document.getElementById('own-pile');
         this.trumpSuit;
         this.room;
         this.myTurn = false;
@@ -14,14 +16,23 @@ class GameScene {
         this.hand = document.getElementById('own-hand'); //player's hand - the cards will be visible
         this.opponentHand = document.getElementById('opponent-hand'); //opponent's hand - cards will not be visible
         this.messages = document.getElementById('messages');
+        this.latesttap;
     }
 
     addEventListeners() {
         return new Promise((resolve, reject) => {
-            document.addEventListener('dblclick', function(e) {
-                if(e.target && e.target.classList.contains('card')) {
-                    player.playCard(e.target.id);
+            document.addEventListener('click', function(e) {
+                
+                let now = new Date().getTime();
+                var timesince = now - gameScene.latesttap;
+                if((timesince < 600) && (timesince > 0)){
+                    if(e.target && e.target.classList.contains('card')) {
+                        player.playCard(e.target.id);
+                    }  
                 }
+
+                gameScene.latesttap = new Date().getTime();
+
             })
             
             // this.chatForm.addEventListener('submit', function(event) {
@@ -59,7 +70,7 @@ class GameScene {
                 newCard.classList.add('card');
                 newCard.setAttribute('id', id);
                 newCard.setAttribute('data-pos', index);
-                newCard.style.left = index * 10 + '%';
+                newCard.style.left = index * 13 + '%';
                 newCard.style.top = '10%';
         
                 resolve(newCard);
@@ -68,7 +79,7 @@ class GameScene {
     
                 newCard.setAttribute("src", cardback);
                 newCard.classList.add('card');
-                newCard.style.left = index * 10 + '%';
+                newCard.style.left = index * 13 + '%';
                 newCard.style.top = '10%';
                 
                 resolve(newCard);
@@ -113,6 +124,8 @@ class GameScene {
         pileCard.classList.add('pile-card');
         
         this.cardPile.appendChild(pileCard);
+        this.opponentPile.appendChild(pileCard.cloneNode());
+        this.ownPile.appendChild(pileCard.cloneNode());
     }
     
     showOpponentsCard(card) {
@@ -122,6 +135,15 @@ class GameScene {
             oppCard.classList.add('played-card');
             this.playArena.appendChild(oppCard);
         })
+    }
+
+    updatePoints(data) {
+        let ownPoints = document.getElementById('own-pts');
+        let oppPoints = document.getElementById('opp-pts');   
+        console.log(data.player)
+        console.log(player.playerNumber)
+        console.log(data.points)
+        data.player === player.playerNumber ? ownPoints.innerHTML = Number(ownPoints.innerHTML) + data.points : oppPoints.innerHTML = Number(oppPoints.innerHTML) + data.points;
     }
 
     displayChatMsg(msg) {
@@ -136,17 +158,28 @@ class GameScene {
     displayStatusMsg(msg) {
         let message = document.createTextNode(msg);
         let msgContainer = document.createElement('li');
+        let shouldScroll;
+
         msgContainer.classList.add('status-msg');
         msgContainer.appendChild(message);
 
+        shouldScroll = messages.scrollTop + messages.clientHeight === messages.scrollHeight;
         this.messages.appendChild(msgContainer);
+
+        if (!shouldScroll) {
+            this.scrollToBottom();
+        }
+    }
+    
+    scrollToBottom() {
+      messages.scrollTop = messages.scrollHeight;
     }
 
     resizeGame () {
         console.log("Resizing")
         let gameArea = document.getElementById('game-container');
 
-        let widthToHeight = 14 / 19;
+        let widthToHeight = 9 / 16;
         // let newWidth = window.outerWidth;
         // let newHeight = window.outerHeight;
         let newWidth = window.innerWidth;

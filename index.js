@@ -50,7 +50,7 @@ io.on('connection', function(socket){
             if(waitingRooms.length > 0) { //there are rooms with players waiting for another player to join
 
                 let gameRoom = waitingRooms.pop();
-                gameRoom.player2 = new Player(socket.id); //set the second player in the room
+                gameRoom.player2 = new Player(socket.id, 'player2'); //set the second player in the room
                 playingRooms[gameRoom.number] = gameRoom //move the room from waiting to playing
                 socket.join(gameRoom.number); //join the socket to the room's number
     
@@ -66,7 +66,7 @@ io.on('connection', function(socket){
     
                 let room = new Room(roomCounter);
                 socket.join(room.number); //join the game
-                room.player1 = new Player(socket.id);
+                room.player1 = new Player(socket.id, 'player1');
     
                 room.sendJoinedRoomStatus('player1');
                 room.sendStatusMsg('Waiting for another player')
@@ -160,6 +160,7 @@ class Room {
         //if both players have made their play, compare their cards to see who wins the turn
         if(this.player1.cardPlayed !== undefined && this.player2.cardPlayed !== undefined) {
             console.log("Both cards available")
+            this.sendStatusMsg(`${player} played ${card.name} of ${card.suit}`);
             this.sendPlayToOpponent(this[player], this[opponent] ); //send the play to the opponent
             this.compareCards(this[opponent], this[player]); //compare the cards and decide who wins the turn. We have to pass who played first - this would be the opponent if we are here
         } else {
@@ -198,10 +199,12 @@ class Room {
         } 
         console.log("Step 1")
         if(card1Wins) {
-            this.player1.points += (card1.power + card2.power);
+            firstPlayer.points += (card1.power + card2.power);
+            io.sockets.to(this.number).emit('update points', {player: firstPlayer.number, points: this.player1.points});
             this.endTurn(firstPlayer, secondPlayer);
         } else {
-            this.player2.points += (card1.power + card2.power);
+            secondPlayer.points += (card1.power + card2.power);
+            io.sockets.to(this.number).emit('update points', {player: secondPlayer.number, points: this.player2.points});
             this.endTurn(secondPlayer, firstPlayer);
         }
 
@@ -277,8 +280,9 @@ class Room {
 }
 
 class Player {
-    constructor(id, name){
+    constructor(id,number, name){
         this.id = id;
+        this.number = number; //player1 or player 2
         this.name = name;
         this.cards=[];
         this.cardPlayed;

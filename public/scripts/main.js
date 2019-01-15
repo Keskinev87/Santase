@@ -56,8 +56,9 @@ function main () {
             player.collectCards();
         })
 
-        socket.on('update points', function(points){
-            player.updatePoints(points)
+        socket.on('update points', function(data){
+            //data includes player number and points
+            gameScene.updatePoints(data)
         })
 
         socket.on('clear play area', function(){
