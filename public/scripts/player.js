@@ -12,6 +12,7 @@ class Player {
         let card = document.getElementById(id);
         
         card.style.left = 0;
+        card.classList.remove('card')
         card.classList.add('played-card');
         this.lastPlayedCardPos = Number(card.dataset.pos);
         this.playArena.appendChild(card);

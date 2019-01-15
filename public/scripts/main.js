@@ -8,6 +8,7 @@ function main () {
     gameScene = new GameScene();
     player = new Player();
     socket = io();
+    gameScene.resizeGame();
 
     //ADD EVENT LISTENERS TO THE ELEMENTS  
     gameScene.addEventListeners().then(() => {

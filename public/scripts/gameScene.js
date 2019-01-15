@@ -24,15 +24,17 @@ class GameScene {
                 }
             })
             
-            this.chatForm.addEventListener('submit', function(event) {
-                socket.emit('chat message', inputMsg.value);
-                inputMsg.value='';
-                event.preventDefault();
-            })
+            // this.chatForm.addEventListener('submit', function(event) {
+            //     socket.emit('chat message', inputMsg.value);
+            //     inputMsg.value='';
+            //     event.preventDefault();
+            // })
         
             this.gameJoinBtn.addEventListener('click', function() {
                 socket.emit('join game')
             })
+
+            window.addEventListener('resize', this.resizeGame);
         
             // readyBtn.addEventListener('click', function() {
             //     socket.emit('player-ready')
@@ -115,7 +117,8 @@ class GameScene {
     
     showOpponentsCard(card) {
         this.createCard('own', 0, card).then((oppCard) => {
-            oppCard.style.left = '20%';
+            oppCard.style.left = '40%';
+            oppCard.classList.remove('card');
             oppCard.classList.add('played-card');
             this.playArena.appendChild(oppCard);
         })
@@ -138,4 +141,29 @@ class GameScene {
 
         this.messages.appendChild(msgContainer);
     }
+
+    resizeGame () {
+        console.log("Resizing")
+        let gameArea = document.getElementById('game-container');
+
+        let widthToHeight = 14 / 19;
+        // let newWidth = window.outerWidth;
+        // let newHeight = window.outerHeight;
+        let newWidth = window.innerWidth;
+        let newHeight = window.innerHeight;
+        let newWidthToHeight = newWidth / newHeight;
+
+        if (newWidthToHeight > widthToHeight) {
+            newWidth = newHeight * widthToHeight;
+            gameArea.style.height = newHeight + 'px';
+            gameArea.style.width = newWidth + 'px';
+        } else {
+            newHeight = newWidth / widthToHeight;
+            gameArea.style.width = newWidth + 'px';
+            gameArea.style.height = newHeight + 'px';
+        }
+
+        gameArea.style.marginTop = (-newHeight / 2) + 'px';
+        gameArea.style.marginLeft = (-newWidth / 2) + 'px'; 
+      }
 }

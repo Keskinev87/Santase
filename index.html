@@ -1,11 +1,11 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>Santase</title>
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
-    <div class="game-container">
+    <div class="game-container" id="game-container">
         <div class="play-scene">
             <div class="oponent-area" id="opponent-area">
                 <div id="opponent-hand">
@@ -28,25 +28,25 @@
                     </div>
                 </div>
             </div>
-            <div class="row controls-container">
-                <button type="button" class="btn btn-success" id="btn-ready">I am ready</button>
-                <button type="button" class="btn btn-success" id="join-game">Play</button>
+            <div class="controls-container">
+                <!-- <button type="button" class="btn btn-success" id="btn-ready">I am ready</button> -->
+                <button type="button" class="play-button" id="join-game">Play</button>
             </div>
         </div>
-            
+        <div class="chat-container">
+            <ul class="messages-container" id="messages">
+        
+            </ul>
+            <!-- <form class="text-center" id="chat-form" action="">
+                <div class="form-group">
+                    <input type="text" class="form-control" autocomplete="off" id="m">
+                </div>
+                <button type="submit" class="btn btn-success">Send</button>
+            </form> -->
+        </div>
         
     </div>
-    <div class="chat-container">
-        <ul class="messages-container" id="messages">
     
-        </ul>
-        <form class="text-center" id="chat-form" action="">
-            <div class="form-group">
-                <input type="text" class="form-control" autocomplete="off" id="m">
-            </div>
-            <button type="submit" class="btn btn-success">Send</button>
-        </form>
-    </div>
     
     <script src="/socket.io/socket.io.js"></script>
     <script src="/scripts/main.js"></script>
