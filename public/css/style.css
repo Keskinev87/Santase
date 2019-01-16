@@ -49,10 +49,27 @@
     height: auto;
 }
 
-#opponent-points {
+.opponent-points, .opponent-rounds-won, .opponent-games-won {
     position: absolute;
     border: 1px solid grey;
     top: 90%;
+    height: 10%;
+    width: 33%;
+}
+
+.opponent-rounds-won {
+    left: 33%;
+}
+
+.opponent-games-won {
+    left: 67%;
+}
+
+.opponent-name {
+    position: absolute;
+    border: 1px solid grey;
+    left: 0;
+    bottom: 10%;
     height: 10%;
     width: 100%;
 }
@@ -71,6 +88,19 @@
     width: 50%;
     height: 100%;
     left: 0;
+}
+
+.announcement-container {
+    position: absolute;
+    z-index: 2;
+    border: 1px solid darkblue;
+    width: 40%;
+    left: 30%;
+    top: 40%;
+    height: 20%;
+    color: chartreuse;
+    background: rgba(255, 0, 0, 0.7);
+    text-align: center;
 }
 
 #card-pile {
@@ -113,12 +143,29 @@
     height: auto;
 }
 
-#own-points {
+.player-name {
+    position: absolute;
+    bottom:10%;
+    left: 0;
+    width:100%;
+    height: 10%;
+    border: 1px solid purple;
+}
+
+.own-points, .own-rounds-won, .own-games-won {
     position: absolute;
     border: 1px solid grey;
     bottom: 0;
     height: 10%;
-    width: 100%;
+    width: 33%;
+}
+
+.own-rounds-won {
+    left: 33%;
+}
+
+.own-games-won {
+    left: 67%;
 }
 
 .controls-container{
