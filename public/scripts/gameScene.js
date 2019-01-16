@@ -9,13 +9,17 @@ class GameScene {
         this.cardPile = document.getElementById('card-pile');
         this.opponentPile = document.getElementById('opponent-pile');
         this.ownPile = document.getElementById('own-pile');
+        this.hand = document.getElementById('own-hand'); //player's hand - the cards will be visible
+        this.opponentHand = document.getElementById('opponent-hand'); //opponent's hand - cards will not be visible
+        this.messages = document.getElementById('messages');
+        this.ownPoints = document.getElementById('own-pts');
+        this.oppPoints = document.getElementById('opp-pts');
         this.trumpSuit;
         this.room;
         this.myTurn = false;
         this.status = '';
-        this.hand = document.getElementById('own-hand'); //player's hand - the cards will be visible
-        this.opponentHand = document.getElementById('opponent-hand'); //opponent's hand - cards will not be visible
-        this.messages = document.getElementById('messages');
+        
+        
         this.latesttap;
     }
 
@@ -54,10 +58,34 @@ class GameScene {
         })
     }
 
+    announce(message) {
+        let announcementMsg = document.getElementById('announcement');
+        let announcementContainer = document.getElementById('announcement-container');
+        console.log(announcementMsg)
+        console.log(announcementContainer)
+
+        announcementMsg.innerHTML = message;
+        announcementContainer.style.visibility = '';
+        console.log(announcementMsg)
+        console.log(announcementContainer)
+
+        setTimeout(function() {
+            announcementContainer.style.visibility = 'hidden';
+            announcementMsg.innerHTML = ''; 
+        }, 4000);
+
+    }
+
     clearPlayArena() {
         while (this.playArena.hasChildNodes()) {   
             this.playArena.removeChild(this.playArena.firstChild);
           }
+    }
+
+    clearTrumpArea() {
+        while(this.cardPile.hasChildNodes()) {
+            this.cardPile.removeChild(this.cardPile.firstChild);
+        }
     }
 
     createCard(type, index, card) {
@@ -144,6 +172,28 @@ class GameScene {
         console.log(player.playerNumber)
         console.log(data.points)
         data.player === player.playerNumber ? ownPoints.innerHTML = Number(ownPoints.innerHTML) + data.points : oppPoints.innerHTML = Number(oppPoints.innerHTML) + data.points;
+    }
+
+    resetRound() {
+        this.playArena.innerHTML='';
+        this.cardPile.innerHTML ='';
+        this.opponentPile.innerHTML ='';
+        this.ownPile.innerHTML = '';
+        this.ownPoints.innerHTML = 0;
+        this.oppPoints.innerHTML = 0;
+
+        let ownCards = this.hand.getElementsByClassName('card');
+        console.log(ownCards)
+        while(ownCards[0]) {
+            ownCards[0].parentNode.removeChild(ownCards[0]);
+        }
+
+        let oppCards = this.opponentHand.getElementsByClassName('card');
+
+        while(oppCards[0]) {
+            oppCards[0].parentNode.removeChild(oppCards[0]);
+        };
+       
     }
 
     displayChatMsg(msg) {

@@ -64,6 +64,20 @@ function main () {
         socket.on('clear play area', function(){
             gameScene.clearPlayArena();
         })
+
+        socket.on('announcement', function(points){
+            gameScene.announce(`I announce ${points}`)
+            let opponent = player.playerNumber == 'player1' ? 'player2' : 'player1';
+            gameScene.updatePoints({player: opponent, points:points});
+        })
+
+        socket.on('clear trump', function(){
+            gameScene.clearTrumpArea();
+        })
+
+        socket.on('end round', function(){
+            gameScene.resetRound();
+        })
     
         socket.on('error', function(error) {
             window.alert(error);
