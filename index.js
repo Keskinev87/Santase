@@ -93,6 +93,11 @@ io.on('connection', function(socket){
         playingRooms[data.room].sendDrawCard(data.player);
     })
 
+    socket.on('announcement', function(data){
+        playingRooms[data.room][data.player].updatePoints(data.points);
+        playingRooms[data.room].sendAnnouncement(data.player, data.points);
+    })
+
     
     
 });
@@ -104,7 +109,6 @@ class Room {
         this.name = 'player' + number;
         this.player1;
         this.player2;
-        this.nextPlayer;
         this.nextCard = 0;
         this.playdeck;
         this.trumpSuit;
@@ -126,12 +130,14 @@ class Room {
             playDeck[i] = newDeck[randCard];
             newDeck.splice(randCard, 1)
         }
-        return playDeck
+        return playDeck;
     }
 
     dealCards(player1, player2) {
-        
+        console.log("Logging this")
+        console.log(this)
         this.playDeck = this.shuffleCards();
+        console.log(this.playDeck)
         
         for (let i = 0; i < 12; i++) {
             if(i % 2 == 1) {
@@ -146,8 +152,9 @@ class Room {
         this.sendPlay(player1);
         this.sendWait(player2);
         this.trumpSuit = this.playDeck[12].suit;
-        io.sockets.to(this.number).emit('deal trump card', this.playDeck[13]);
-        this.nextCard++;
+        console.log("Trump card is")
+        console.log(this.playDeck[this.nextCard])
+        io.sockets.to(this.number).emit('deal trump card', this.playDeck[this.nextCard]);
 
     }
 
@@ -159,7 +166,7 @@ class Room {
         this[player].cardPlayed = card;
         //if both players have made their play, compare their cards to see who wins the turn
         if(this.player1.cardPlayed !== undefined && this.player2.cardPlayed !== undefined) {
-            console.log("Both cards available")
+           
             this.sendStatusMsg(`${player} played ${card.name} of ${card.suit}`);
             this.sendPlayToOpponent(this[player], this[opponent] ); //send the play to the opponent
             this.compareCards(this[opponent], this[player]); //compare the cards and decide who wins the turn. We have to pass who played first - this would be the opponent if we are here
@@ -183,36 +190,53 @@ class Room {
         let card1 = firstPlayer.cardPlayed;
         let card2 = secondPlayer.cardPlayed;
         let card1Wins; //is card1 more powerfull than card2
-
+        console.log("Card 1");
+        console.log(card1);
+        console.log("Card 2")
+        console.log(card2)
+        console.log(this.trumpSuit)
+        console.log(card1.suit === this.trumpSuit)
         //1. Equal suits? - does not depend on the stage of the game. If the suits are equal, the higher takes. 
         //2. One of the cards is a trump card, the other is not? - does not depend on the stage. Trump card always takes ordinary one. 
         //3. Different non-trump cards? - depends on who played first. If the opponent plays different non-trump card, the player wins.
         if(card1.suit === card2.suit) {
+            console.log("Case equal suits")
             card1.power > card2.power ? card1Wins = true : card1Wins = false;
         } else if(card1.suit !== card2.suit) {
             if(card1.suit === this.trumpSuit || card2.suit === this.trumpSuit) {
+                console.log("Case trump card")
                 card1.suit === this.trumpSuit ? card1Wins = true : card1Wins = false;
                 card2.suit === this.trumpSuit ? card1Wins = false : card1Wins = true;
             } else {
+                console.log("Case no trump card")
                 card1Wins = true;
             }
         } 
-        console.log("Step 1")
+        
         if(card1Wins) {
             firstPlayer.points += (card1.power + card2.power);
-            io.sockets.to(this.number).emit('update points', {player: firstPlayer.number, points: this.player1.points});
-            this.endTurn(firstPlayer, secondPlayer);
+            if(firstPlayer.points >= 66) {
+                this.endRound(firstPlayer, secondPlayer);
+            } else {
+                io.sockets.to(this.number).emit('update points', {player: firstPlayer.number, points: this.player1.points});
+                this.endTurn(firstPlayer, secondPlayer);
+            }    
         } else {
             secondPlayer.points += (card1.power + card2.power);
-            io.sockets.to(this.number).emit('update points', {player: secondPlayer.number, points: this.player2.points});
-            this.endTurn(secondPlayer, firstPlayer);
+            if(secondPlayer.points >= 66) {
+                this.endRound(secondPlayer, firstPlayer);
+            } else{
+                io.sockets.to(this.number).emit('update points', {player: secondPlayer.number, points: this.player2.points});
+                this.endTurn(secondPlayer, firstPlayer);
+            }
+           
         }
 
         
     }
 
     endTurn(winner, loser) {
-        console.log("Ending turn")
+        
         this.sendStatusMsg(`${winner.name} wins the round`); //send status message with the winner
         io.sockets.to(winner.id).emit('collect cards'); //send event to collect the cards from the play arena
         io.sockets.to(loser.id).emit('clear play area'); //send event to clear the play arena
@@ -224,30 +248,62 @@ class Room {
         if(this.stage == 'initial'){
             this.sendDrawCard(winner, loser); //send draw card event 
         }
-        console.log("Step 2")
+        
         this.sendPlay(winner);
         this.sendWait(loser);
     }
 
+    endRound(winner, loser){
+        winner.roundPoints++;
+
+        //reset everything;
+        this.player1.cards=[];
+        this.player1.cardPlayed = undefined;
+        this.player1.points = 0;
+
+        this.player2.cards=[];
+        this.player2.cardPlayed = undefined;
+        this.player2.points = 0;
+
+        this.nextCard = 0;
+        this.playdeck = [];
+        this.trumpSuit = '';
+        this.stage = 'initial';
+
+        io.sockets.to(this.number).emit("end round");
+        this.sendStatusMsg(`${winner.number} wins...`);
+        this.sendStatusMsg("Starting new round...");
+
+        let self = this;
+        setTimeout(function(){
+            self.dealCards(winner, loser);
+        }, 80000);
+    }
+
     sendDrawCard(winner, loser) {
         this.nextCard++;
-        console.log(this.nextCard);
-        console.log(this.playDeck[this.nextCard])    
         io.sockets.to(winner.id).emit("draw card", this.playDeck[this.nextCard])
-        this.nextCard++;
-        console.log(this.nextCard);
-        console.log(this.playDeck[this.nextCard])
-        io.sockets.to(loser.id).emit("draw card", this.playDeck[this.nextCard])
 
-        if(this.nextCard == 23) {
-            this.stage = 'pile-over'
+        this.nextCard++;
+        if(this.nextCard == 24) {
+            this.stage = 'pile-over';
+            this.nextCard = 12;
+            io.sockets.to(this.number).emit('clear trump');
+            console.log("The last card")
+            console.log(this.nextCard);
         }
+        io.sockets.to(loser.id).emit("draw card", this.playDeck[this.nextCard]);
+    }
+
+    sendAnnouncement(player, points) {
+        let opponent = this.getOpponent(player);
+        io.sockets.to(this[opponent].id).emit('announcement', points);
     }
         
     sendPlay(player, cardPlayed, stage) {
         //Tells the front-end of the opponent to play. If it's opponents turn, we will determine through the hand which cards are forbidden to play.
         //The front-end will only enable the cards that are allowed to be played. 
-        console.log("step 3")
+        
         io.sockets.to(player.id).emit('play', cardPlayed, stage);
     }
 
@@ -287,8 +343,8 @@ class Player {
         this.cards=[];
         this.cardPlayed;
         this.points=0;
-        this.overallPoints=0;
-        this.gamePoints;
+        this.roundPoints=0;
+        this.gamePoints=0;
     }
 
     updatePoints(points) {
