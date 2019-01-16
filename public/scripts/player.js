@@ -15,6 +15,7 @@ class Player {
         card.classList.remove('card')
         card.classList.add('played-card');
         this.lastPlayedCardPos = Number(card.dataset.pos);
+        this.checkForAnnouncement(id);
         this.playArena.appendChild(card);
         this.reorderHand();
         this.disableOwnHand();
@@ -131,6 +132,41 @@ class Player {
         for (let i = 0; i < cardsInHand.length; i++) {
             cardsInHand[i].style.left = i * 10 + '%'; 
         }
+    }
+
+    checkForAnnouncement(id) {
+        console.log(this.playArena.hasChildNodes());
+        if(!this.playArena.hasChildNodes()) { //it has to be your turn to announce 
+            let playerCard = cards[id];
+            let cardsInHand = document.getElementById("own-hand").querySelectorAll(".card");
+    
+            if(playerCard.power == 3 || playerCard.power == 4) {
+                for (let cardInHand of cardsInHand) {
+                    let card = cards[cardInHand.id];
+                    if(playerCard.suit == card.suit && (card.power == 3 || card.power == 4)){
+                        playerCard.suit == gameScene.trumpSuit ? this.announceForty() : this.announceTwenty();
+                    }
+                }
+            }
+        }
+    }
+
+    announceTwenty() {
+        socket.emit('announcement', {room: gameScene.room, player: this.playerNumber, points: 20});
+        
+        gameScene.announce('I announce 20');
+        console.log("player to update")
+        console.log(this.number)
+        gameScene.updatePoints({player: this.playerNumber, points: 20});
+        
+    }
+
+    announceForty() {
+        socket.emit('announcement', {room: gameScene.room, player: this.playerNumber, points: 40});
+        gameScene.announce('I announce 40');
+        console.log("player to update")
+        console.log(this.number)
+        gameScene.updatePoints({player: this.playerNumber, points: 40});
     }
 
 }
