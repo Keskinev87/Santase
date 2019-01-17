@@ -215,6 +215,7 @@ class Room {
         
         if(card1Wins) {
             firstPlayer.points += (card1.power + card2.power);
+            console.log(firstPlayer.points)
             if(firstPlayer.points >= 66) {
                 this.endRound(firstPlayer, secondPlayer);
             } else {
@@ -223,11 +224,20 @@ class Room {
             }    
         } else {
             secondPlayer.points += (card1.power + card2.power);
+            console.log(secondPlayer.points)
             if(secondPlayer.points >= 66) {
-                this.endRound(secondPlayer, firstPlayer);
+                let self = this;
+                setTimeout(function(){
+                    self.endRound(secondPlayer, firstPlayer);
+                }, 1000);
+                
             } else{
                 io.sockets.to(this.number).emit('update points', {player: secondPlayer.number, points: this.player2.points});
-                this.endTurn(secondPlayer, firstPlayer);
+                let self = this;
+                setTimeout(function(){
+                    self.endTurn(secondPlayer, firstPlayer);
+                }, 2000)
+                
             }
            
         }
@@ -247,6 +257,10 @@ class Room {
 
         if(this.stage == 'initial'){
             this.sendDrawCard(winner, loser); //send draw card event 
+        }
+        
+        if(this.nextCard == 24) {
+            this.endRound(winner, loser);
         }
         
         this.sendPlay(winner);
@@ -270,14 +284,14 @@ class Room {
         this.trumpSuit = '';
         this.stage = 'initial';
 
-        io.sockets.to(this.number).emit("end round");
+        io.sockets.to(this.number).emit("end round", winner);
         this.sendStatusMsg(`${winner.number} wins...`);
         this.sendStatusMsg("Starting new round...");
 
         let self = this;
         setTimeout(function(){
             self.dealCards(winner, loser);
-        }, 80000);
+        }, 8000);
     }
 
     sendDrawCard(winner, loser) {
@@ -287,10 +301,9 @@ class Room {
         this.nextCard++;
         if(this.nextCard == 24) {
             this.stage = 'pile-over';
-            this.nextCard = 12;
             io.sockets.to(this.number).emit('clear trump');
-            console.log("The last card")
-            console.log(this.nextCard);
+            io.sockets.to(loser.id).emit("draw card", this.playDeck[12]); //draw the trump card, beause it is the last
+            return;
         }
         io.sockets.to(loser.id).emit("draw card", this.playDeck[this.nextCard]);
     }

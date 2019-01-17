@@ -1,6 +1,8 @@
 class GameScene {
     constructor() {
         this.chatForm = document.getElementById('chat-form'); //get the typed message
+        this.menu = document.getElementById('menu');
+        this.gameScene = document.getElementById('game-container');
         this.inputMsg = document.getElementById('m');
         this.gameJoinBtn = document.getElementById('join-game');
         this.readyBtn = document.getElementById('btn-ready');
@@ -14,6 +16,8 @@ class GameScene {
         this.messages = document.getElementById('messages');
         this.ownPoints = document.getElementById('own-pts');
         this.oppPoints = document.getElementById('opp-pts');
+        this.oppRounds = document.getElementById('opp-rounds-won');
+        this.ownRounds = document.getElementById('own-rounds-won')
         this.trumpSuit;
         this.room;
         this.myTurn = false;
@@ -38,24 +42,21 @@ class GameScene {
                 gameScene.latesttap = new Date().getTime();
 
             })
-            
-            // this.chatForm.addEventListener('submit', function(event) {
-            //     socket.emit('chat message', inputMsg.value);
-            //     inputMsg.value='';
-            //     event.preventDefault();
-            // })
         
             this.gameJoinBtn.addEventListener('click', function() {
+                gameScene.showGameScene();
                 socket.emit('join game')
             })
 
             window.addEventListener('resize', this.resizeGame);
         
-            // readyBtn.addEventListener('click', function() {
-            //     socket.emit('player-ready')
-            // })
             resolve();
         })
+    }
+
+    showGameScene() {
+        this.gameScene.style.visibility = '';
+        this.menu.style.visibility = 'hidden';
     }
 
     announce(message) {
@@ -99,7 +100,7 @@ class GameScene {
                 newCard.setAttribute('id', id);
                 newCard.setAttribute('data-pos', index);
                 newCard.style.left = index * 13 + '%';
-                newCard.style.top = '10%';
+                newCard.style.top = '15%';
         
                 resolve(newCard);
             } else if(type =="opponent") {
@@ -108,7 +109,7 @@ class GameScene {
                 newCard.setAttribute("src", cardback);
                 newCard.classList.add('card');
                 newCard.style.left = index * 13 + '%';
-                newCard.style.top = '10%';
+                newCard.style.top = '15%';
                 
                 resolve(newCard);
             } else {
@@ -174,13 +175,18 @@ class GameScene {
         data.player === player.playerNumber ? ownPoints.innerHTML = Number(ownPoints.innerHTML) + data.points : oppPoints.innerHTML = Number(oppPoints.innerHTML) + data.points;
     }
 
-    resetRound() {
+    updateRoundPoints(target) {
+        target == player.number ? this.ownRounds.innerHTML = Number(this.ownRounds.innerHTML) + 1 : this.oppRounds.innerHTML = Number(this.oppRounds.innerHTML) + 1;
+    }
+
+    resetRound(winner) {
         this.playArena.innerHTML='';
         this.cardPile.innerHTML ='';
         this.opponentPile.innerHTML ='';
         this.ownPile.innerHTML = '';
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
+        this.updateRoundPoints(winner.number);
 
         let ownCards = this.hand.getElementsByClassName('card');
         console.log(ownCards)
@@ -199,7 +205,7 @@ class GameScene {
     displayChatMsg(msg) {
         
         let message = document.createTextNode(msg);
-        let msgContainer = document.createElement('li');
+        let msgContainer = document.createElement('p');
 
         msgContainer.appendChild(message);
         this.messages.appendChild(msgContainer);
@@ -207,7 +213,7 @@ class GameScene {
 
     displayStatusMsg(msg) {
         let message = document.createTextNode(msg);
-        let msgContainer = document.createElement('li');
+        let msgContainer = document.createElement('p');
         let shouldScroll;
 
         msgContainer.classList.add('status-msg');

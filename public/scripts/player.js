@@ -53,7 +53,7 @@ class Player {
         drawnCard.classList.add('card');
         drawnCard.setAttribute('id', id);
         drawnCard.style.left = '50%';
-        drawnCard.style.top = '10%';
+        drawnCard.style.top = '15%';
        
         this.hand.appendChild(drawnCard);
     }

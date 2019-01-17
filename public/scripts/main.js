@@ -75,8 +75,8 @@ function main () {
             gameScene.clearTrumpArea();
         })
 
-        socket.on('end round', function(){
-            gameScene.resetRound();
+        socket.on('end round', function(winner){
+            gameScene.resetRound(winner);
         })
     
         socket.on('error', function(error) {

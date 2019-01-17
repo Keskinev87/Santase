@@ -6,13 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   </head>
   <body>
-    <div class="game-container" id="game-container">
+    <div class="menu" id="menu">
+        <button type="button" class="play-button" id="join-game">Play</button>
+        <button type="button" class="instructions-button" id="instructions-button">Instructions</button>
+    </div>
+    <div class="game-container" id="game-container" style="visibility: hidden">
         <div class="play-scene">
             <div class="oponent-area" id="opponent-area">
+                <div class="opponent-name">Player: <span id='opp-name'></span></div>
                 <div id="opponent-hand">
-                    <div class="opponent-name">Player: <span id='opp-name'></span></div>
-                    <div class="opponent-points">Points: <span id='opp-pts'>0</span></div>
-                    <div class="opponent-rounds-won">Rounds: <span id='opp-rounds-won'>0</span></div>
+                    <div class="opponent-points">Pts: <span id='opp-pts'>0</span></div>
+                    <div class="opponent-rounds-won">Rnds: <span id='opp-rounds-won'>0</span></div>
                     <div class="opponent-games-won">Games: <span id='opp-games-won'>0</span></div>
                 </div>
                 <div id="opponent-pile">
@@ -30,10 +34,10 @@
                 <!-- <img class="card" src="images/transparent-1.png" style="background: url(images/card-back-1.png)"  draggable="true" id="test-card"> -->
             </div>
             <div class="own-area" id="own-area">
+                <div class="player-name">Player: <span id='own-name'></span></div>
                 <div id="own-hand">
-                   <div class="player-name">Player: <span id='own-name'></span></div>
-                   <div class="own-points">Points: <span id='own-pts'>0</span></div>
-                   <div class="own-rounds-won">Rounds: <span id='own-rounds-won'>0</span></div>
+                   <div class="own-points">Pts: <span id='own-pts'>0</span></div>
+                   <div class="own-rounds-won">Rnds: <span id='own-rounds-won'>0</span></div>
                    <div class="own-games-won">Games: <span id='own-games-won'>0</span></div>
                 </div>
                 <div id="own-pile">
@@ -41,14 +45,13 @@
                 </div>
             </div>
             <div class="controls-container">
-                <!-- <button type="button" class="btn btn-success" id="btn-ready">I am ready</button> -->
-                <button type="button" class="play-button" id="join-game">Play</button>
+                <button type="button" class="control-button" id="change-trump">Change Trump Card</button>
             </div>
         </div>
         <div class="chat-container" id="chat-container">
-            <ul class="messages-container" id="messages">
+            <div class="messages-container" id="messages">
         
-            </ul>
+            </div>
             <!-- <form class="text-center" id="chat-form" action="">
                 
                 <input type="text" class="chat-input" autocomplete="off" id="m">
