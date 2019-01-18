@@ -78,6 +78,12 @@ function main () {
         socket.on('end round', function(winner){
             gameScene.resetRound(winner);
         })
+
+        socket.on('enable trump change', function(swapCard){
+            console.log("Enabling trump change")
+            player.swapCard = swapCard;
+            gameScene.allowTrumpChange();
+        })
     
         socket.on('error', function(error) {
             window.alert(error);

@@ -17,7 +17,8 @@ class GameScene {
         this.ownPoints = document.getElementById('own-pts');
         this.oppPoints = document.getElementById('opp-pts');
         this.oppRounds = document.getElementById('opp-rounds-won');
-        this.ownRounds = document.getElementById('own-rounds-won')
+        this.ownRounds = document.getElementById('own-rounds-won');
+        this.trumpChangeAllowed = false;
         this.trumpSuit;
         this.room;
         this.myTurn = false;
@@ -77,6 +78,14 @@ class GameScene {
 
     }
 
+    allowTrumpChange(){
+        console.log("Should be enabled");
+        let trumpCard = document.getElementsByClassName('trump-card')[0];
+        trumpCard.addEventListener('click', function() {
+            player.swapTrumpCard();
+        });
+    }
+
     clearPlayArena() {
         while (this.playArena.hasChildNodes()) {   
             this.playArena.removeChild(this.playArena.firstChild);
@@ -94,11 +103,14 @@ class GameScene {
             if(type=='own') {
                 let newCard = document.createElement('img');
                 let id = card.number;
+                let cardName = cards[card.number].number + cards[card.number].suit;
     
                 newCard.setAttribute("src", cards[card.number].image);
                 newCard.classList.add('card');
                 newCard.setAttribute('id', id);
                 newCard.setAttribute('data-pos', index);
+                newCard.setAttribute('data-name', cardName);
+                newCard.setAttribute('data-suit', card.suit);
                 newCard.style.left = index * 13 + '%';
                 newCard.style.top = '15%';
         
@@ -107,7 +119,7 @@ class GameScene {
                 let newCard = document.createElement('img');
     
                 newCard.setAttribute("src", cardback);
-                newCard.classList.add('card');
+                newCard.classList.add('opp-card');
                 newCard.style.left = index * 13 + '%';
                 newCard.style.top = '15%';
                 
@@ -136,8 +148,10 @@ class GameScene {
 
     dealTrumpCard(card) {
         let trumpCard = document.createElement('img');
+        let cardName = cards[card.number].number + cards[card.number].suit;
         let id = card.number;
         trumpCard.setAttribute('id', id);
+        trumpCard.setAttribute('data-name', cardName);
         trumpCard.setAttribute('src', cards[card.number].image);
        
         trumpCard.classList.add('trump-card');
