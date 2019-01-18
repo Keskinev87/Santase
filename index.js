@@ -138,24 +138,51 @@ class Room {
         console.log(this)
         this.playDeck = this.shuffleCards();
         console.log(this.playDeck)
-        
+        this.trumpSuit = this.playDeck[12].suit;
+        io.sockets.to(this.number).emit('deal trump card', this.playDeck[12]);
         for (let i = 0; i < 12; i++) {
             if(i % 2 == 1) {
+                if(this.playDeck[i].suit == this.trumpSuit && this.playDeck[i].power == 0) {
+                    io.sockets.to(player1.id).emit("enable trump change", this.playDeck[i]);
+                }
                 player1.cards.push(this.playDeck[i])
             } else {
+                if(this.playDeck[i].suit == this.trumpSuit && this.playDeck[i].power == 0) {
+                    io.sockets.to(player2.id).emit("enable trump change", this.playDeck[i]);
+                }
                 player2.cards.push(this.playDeck[i])
             }
         }
         this.nextCard += 12;
+        bubbleSort(player1.cards, player1.cards.length);
+        bubbleSort(player2.cards, player2.cards.length);
         io.sockets.to(player1.id).emit('deal cards', player1.cards);
         io.sockets.to(player2.id).emit('deal cards', player2.cards);
         this.sendPlay(player1);
         this.sendWait(player2);
-        this.trumpSuit = this.playDeck[12].suit;
-        console.log("Trump card is")
-        console.log(this.playDeck[this.nextCard])
-        io.sockets.to(this.number).emit('deal trump card', this.playDeck[this.nextCard]);
 
+
+        function bubbleSort(arr, n) {
+            // Base case 
+            if (n == 1) 
+                return; 
+        
+            // One pass of bubble sort. After 
+            // this pass, the largest element 
+            // is moved (or bubbled) to end. 
+            for (let i=0; i < n-1; i++) {
+                if (arr[i].number > arr[i+1].number) {
+                    let temp = arr[i]; 
+                    arr[i] = arr[i+1]; 
+                    arr[i+1] = temp;
+                } 
+            }
+                
+        
+            // Largest element is fixed, 
+            // recur for remaining array 
+            bubbleSort(arr, n-1); 
+        }
     }
 
     playTurn(data) {
@@ -166,7 +193,6 @@ class Room {
         this[player].cardPlayed = card;
         //if both players have made their play, compare their cards to see who wins the turn
         if(this.player1.cardPlayed !== undefined && this.player2.cardPlayed !== undefined) {
-           
             this.sendStatusMsg(`${player} played ${card.name} of ${card.suit}`);
             this.sendPlayToOpponent(this[player], this[opponent] ); //send the play to the opponent
             this.compareCards(this[opponent], this[player]); //compare the cards and decide who wins the turn. We have to pass who played first - this would be the opponent if we are here
@@ -296,7 +322,13 @@ class Room {
 
     sendDrawCard(winner, loser) {
         this.nextCard++;
-        io.sockets.to(winner.id).emit("draw card", this.playDeck[this.nextCard])
+        console.log("Logging next card")
+        console.log(this.playDeck[this.nextCard])
+        if(this.playDeck[this.nextCard].suit == this.trumpSuit && cards[this.nextCard].power == 0) {
+            console.log("Allow swaping trump")
+            io.sockets.to(winner.id).emit("enable trump change", this.playDeck[this.nextCard]);
+        }
+        io.sockets.to(winner.id).emit("draw card", this.playDeck[this.nextCard]);
 
         this.nextCard++;
         if(this.nextCard == 24) {
@@ -304,6 +336,10 @@ class Room {
             io.sockets.to(this.number).emit('clear trump');
             io.sockets.to(loser.id).emit("draw card", this.playDeck[12]); //draw the trump card, beause it is the last
             return;
+        }
+        if(this.playDeck[this.nextCard].suit == this.trumpSuit && cards[this.nextCard].power == 0) {
+            console.log("Allow swaping trump")
+            io.sockets.to(loser.id).emit("enable trump change", this.playDeck[this.nextCard]);
         }
         io.sockets.to(loser.id).emit("draw card", this.playDeck[this.nextCard]);
     }
