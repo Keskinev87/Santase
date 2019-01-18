@@ -2,27 +2,27 @@
     body {
         font-size: 3vw;
     }
-    .control-button {
+    /* .control-button {
         font-size: 3vw;
-    }
+    } */
 }
 
 @media screen and (max-width: 800px) {
     body {
         font-size: 2.5vw;
     }
-    .control-button {
+    /* .control-button {
         font-size: 2.5vw;
-    }
+    } */
 }
 
 @media screen and (min-width: 801px) {
     body {
         font-size: 9px;
     }
-    .control-button {
+    /* .control-button {
         font-size: 2.5vw;
-    }
+    } */
 }
 
 body {
@@ -278,6 +278,13 @@ body {
 }
 
 .card {
+    position: absolute;
+    width: 30%;
+    height: auto;
+    cursor: -webkit-grab;
+}
+
+.opp-card {
     position: absolute;
     width: 30%;
     height: auto;
