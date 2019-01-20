@@ -75,14 +75,23 @@ function main () {
             gameScene.clearTrumpArea();
         })
 
+        socket.on('trump card changed', function(card){
+            gameScene.swapTrump(card);
+        })
+
         socket.on('end round', function(winner){
             gameScene.resetRound(winner);
         })
 
         socket.on('enable trump change', function(swapCard){
-            console.log("Enabling trump change")
+            console.log("Enabling trump change");
             player.swapCard = swapCard;
             gameScene.allowTrumpChange();
+        })
+
+        socket.on('closed', function(player){
+            console.log("Closed announced");
+            gameScene.handleClosed(player);
         })
     
         socket.on('error', function(error) {

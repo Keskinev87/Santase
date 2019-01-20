@@ -24,7 +24,7 @@ class Player {
     }
 
     swapTrumpCard() {
-        socket.emit('changed trump card', {room: gameScene.room, player: this.playerNumber});
+        socket.emit('changed trump card', {room: gameScene.room, player: this.playerNumber, ownTrump: this.swapCard});
         let trumpCard = document.getElementsByClassName('trump-card')[0];
         let ownTrump = document.getElementById(this.swapCard.number);
 
@@ -89,67 +89,88 @@ class Player {
             ownCard.classList.add('disabled-card');
         } 
         this.hand.classList.add('disabled-hand')
+        if(gameScene.stage == 'initial') {
+            let pileCard = document.getElementById('play-pile-card');
+            pileCard.disabled = true;
+        }
         //disables the player's hand (waiting for the opponent to play);
     }
 
     enableOwnHand(cardPlayed, stage) {
         //this method will activate only the cards that are allowed to be played.
-        console.log("Card played is")
-        console.log(cardPlayed)
-        let allowedSuits = [];
-        let allowedPower; 
-        let hasValidCards = false;
-
-        switch (stage) {
-            case 'initial': {
-                allowedSuits = suits;
-                allowedPower = 0;
-                break;
-            }
-            case 'pile-over': {
-                allowedSuits.push(cardPlayed.suit);
-                allowedPower = cardPlayed.power;
-                break;
-            }
-            case 'closed': {
-                allowedSuits.push(cardPlayed.suit);
-                allowedPower = cardPlayed.power;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-        
         let ownCards = this.hand.getElementsByClassName('card');
-        
-        for (let ownCard of ownCards) {
-            
-            let tempCard = cards[Number(ownCard.id)];
-            for(let suit of allowedSuits) {
-                if (tempCard.suit == suit && tempCard.power >= allowedPower) {
-                    ownCard.classList.remove('disabled-card');
-                    hasValidCards = true;
-                } 
-            }
-            
-        }
 
-        if(!hasValidCards) {
-            for (let ownCard of ownCards) {
-                if(ownCard.suit == gameScene.trumpSuit){
-                    ownCard.classList.remove('disabled-card');
-                    hasValidCards = true;
+        if( this.playArena.hasChildNodes()){
+            let allowedSuits = [];
+            let allowedPower; 
+            let hasValidCards = false;
+    
+            switch (stage) {
+                case 'initial': {
+                    allowedSuits = suits;
+                    allowedPower = 0;
+                    //allow closing
+                    if(!this.playArena.hasChildNodes()) {
+                        let pileCard = document.getElementById('play-pile-card');
+                        pileCard.disabled = false;
+                    }
+                    break;
+                }
+                case 'pile-over': {
+                    allowedSuits.push(cardPlayed.suit);
+                    allowedPower = cardPlayed.power;
+                    break;
+                }
+                case 'closed': {
+                    allowedSuits.push(cardPlayed.suit);
+                    allowedPower = cardPlayed.power;
+                    break;
+                }
+                default: {
+                    break;
                 }
             }
-        }
-
-        if(!hasValidCards) {
+            
+            
+            
+            for (let ownCard of ownCards) {
+                
+                let tempCard = cards[Number(ownCard.id)];
+                for(let suit of allowedSuits) {
+                    if (tempCard.suit == suit && tempCard.power >= allowedPower) {
+                        ownCard.classList.remove('disabled-card');
+                        hasValidCards = true;
+                    } else if(tempCard.suit == suit) {
+                        ownCard.classList.remove('disabled-card');
+                        hasValidCards = true;
+                    }
+                }
+                
+            }
+    
+            if(!hasValidCards) {
+                for (let ownCard of ownCards) {
+                    if(cards[ownCard.id].suit == gameScene.trumpSuit){
+                        ownCard.classList.remove('disabled-card');
+                        hasValidCards = true;
+                    }
+                }
+            }
+    
+            if(!hasValidCards) {
+                for (let ownCard of ownCards) {
+                    ownCard.classList.remove('disabled-card');
+                }
+            }
+            this.hand.classList.remove('disabled-hand');
+        } else {
             for (let ownCard of ownCards) {
                 ownCard.classList.remove('disabled-card');
             }
+            
+            this.hand.classList.remove('disabled-hand');
         }
-        this.hand.classList.remove('disabled-hand');
+        
     }
 
     reorderHand() {
@@ -173,9 +194,7 @@ class Player {
         //attach the cards again in sorted order
         for (let i = 0; i < arr.length; i++) {
             let curCard = cards[arr[i]];
-            console.log(arr[i]);
-            console.log(cards[arr[i]])
-            console.log(curCard)
+           
             gameScene.createCard('own', i, curCard).then((card) => {
                 this.hand.appendChild(card);
             }); 

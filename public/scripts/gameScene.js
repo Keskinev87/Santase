@@ -18,6 +18,9 @@ class GameScene {
         this.oppPoints = document.getElementById('opp-pts');
         this.oppRounds = document.getElementById('opp-rounds-won');
         this.ownRounds = document.getElementById('own-rounds-won');
+        this.hostPrivateRoomBtn = document.getElementById('host-private-room');
+        this.joinPrivateRoomBtn = document.getElementById('join-private-room');
+        this.gameHostJoinForm = document.getElementById('game-host-join-form');
         this.trumpChangeAllowed = false;
         this.trumpSuit;
         this.room;
@@ -30,6 +33,7 @@ class GameScene {
 
     addEventListeners() {
         return new Promise((resolve, reject) => {
+            
             document.addEventListener('click', function(e) {
                 
                 let now = new Date().getTime();
@@ -46,14 +50,81 @@ class GameScene {
         
             this.gameJoinBtn.addEventListener('click', function() {
                 gameScene.showGameScene();
-                socket.emit('join game')
+                socket.emit('join game');
             })
+
+            this.hostPrivateRoomBtn.addEventListener('click', function(event){
+                gameScene.showHostJoinForm('host', event);
+            })
+
+            this.joinPrivateRoomBtn.addEventListener('click', function(event){
+                gameScene.showHostJoinForm('join', event);
+            })
+
 
             window.addEventListener('resize', this.resizeGame);
         
             resolve();
         })
     }
+
+    showHostJoinForm(mode, e) {
+        e.preventDefault();
+        this.menu.style.visibility = 'hidden';
+        this.gameHostJoinForm.style.visibility = '';
+        if(mode === 'host') {
+           this.gameHostJoinForm.addEventListener('submit', function(event) {
+               event.preventDefault();
+               let nickName = document.getElementById('nickname-input').value;
+               let gameCode = document.getElementById('roomcode-input').value;
+               let nickNameErr = document.getElementById('nickname-error');
+               let gameCodeErr = document.getElementById('roomcode-error');
+
+               if(!nickName){
+                    nickNameErr.innerHTML = "Please enter some nickname";
+                    nickNameErr.style.visibility = '';
+               }
+
+               if(!gameCode){
+                    gameCodeErr.innerHTML = "Please enter the code of the room you want to join";
+                    gameCodeErr.style.visibility = '';
+               } 
+               gameScene.showGameScene();
+               socket.emit('host private room', {nickname: nickName, gameCode: gameCode});
+               console.log(nickName, gameCode);
+               
+           })
+        } else if(mode === 'join') {
+            this.gameHostJoinForm.addEventListener('submit', function(event){
+                event.preventDefault();
+                let nickName = document.getElementById('nickname-input').value;
+                let gameCode = document.getElementById('roomcode-input').value;
+                let nickNameErr = document.getElementById('nickname-error');
+                let gameCodeErr = document.getElementById('roomcode-error');
+
+                if(!nickName){
+                        nickNameErr.innerHTML = "Please enter some nickname";
+                        nickNameErr.style.visibility = '';
+                }
+
+                if(!gameCode){
+                        gameCodeErr.innerHTML = "Please enter the code of the room you want to join";
+                        gameCodeErr.style.visibility = '';
+                } 
+                gameScene.showGameScene();
+                socket.emit('join private room', {nickName: nickName, gameCode: gameCode});
+                console.log(nickName, gameCode);
+            })
+        }
+        
+    }
+
+    closeForm(e) {
+        e.preventDefault();
+        this.gameHostJoinForm.style.visibility = "hidden";
+        this.menu.style.visibility = "";
+    }
+
 
     showGameScene() {
         this.gameScene.style.visibility = '';
@@ -76,9 +147,26 @@ class GameScene {
             announcementMsg.innerHTML = ''; 
         }, 4000);
 
+    } 
+
+    announceClosed() {
+        socket.emit('closed', {room: gameScene.room, player: player.playerNumber});
     }
 
-    allowTrumpChange(){
+    handleClosed(player) {
+        let closedCardBack = document.getElementById('closed-card-back');
+        let pileCard = document.getElementById('play-pile-card');
+        let trumpCard = document.getElementsByClassName('trump-card')[0];
+
+        this.stage = 'closed';
+        closedCardBack.style.visibility = '';
+        pileCard.classList.add('disabled-card');
+        trumpCard.classList.add('disabled-card');
+        this.announce(player + "closed");
+    }
+
+    allowTrumpChange() {
+        //allows the change of the trump for the current player
         console.log("Should be enabled");
         let trumpCard = document.getElementsByClassName('trump-card')[0];
         trumpCard.addEventListener('click', function() {
@@ -150,25 +238,46 @@ class GameScene {
         let trumpCard = document.createElement('img');
         let cardName = cards[card.number].number + cards[card.number].suit;
         let id = card.number;
+        // let swapIcon = document.createElement('img');
+
+
+        // swapIcon.setAttribute('src', swapIcn);
+        // swapIcon.classList.add('swap-icon');
+
         trumpCard.setAttribute('id', id);
         trumpCard.setAttribute('data-name', cardName);
         trumpCard.setAttribute('src', cards[card.number].image);
-       
         trumpCard.classList.add('trump-card');
 
         this.cardPile.appendChild(trumpCard);
+        // this.cardPile.appendChild(swapIcon);
         this.trumpSuit = card.suit;
     }
 
     dealPileCards() {
         let pileCard = document.createElement('img');
+        let closedImage = document.createElement('img');
+        closedImage.setAttribute('src', closedCardBack);
+        closedImage.setAttribute('id', 'closed-card-back');
+        closedImage.style.visibility = 'hidden';
+        closedImage.classList.add('pile-card');
     
         pileCard.setAttribute("src", cardback);
         pileCard.classList.add('pile-card');
-        
-        this.cardPile.appendChild(pileCard);
-        this.opponentPile.appendChild(pileCard.cloneNode());
+
         this.ownPile.appendChild(pileCard.cloneNode());
+        this.opponentPile.appendChild(pileCard.cloneNode());
+        
+        let trumpPileCard = pileCard.cloneNode();
+        trumpPileCard.setAttribute('id', 'play-pile-card')
+        trumpPileCard.addEventListener('click', function(){
+            console.log("Closed")
+            gameScene.announceClosed();
+        })
+        this.cardPile.appendChild(trumpPileCard);
+        this.cardPile.appendChild(closedImage);
+        
+        
     }
     
     showOpponentsCard(card) {
@@ -186,11 +295,11 @@ class GameScene {
         console.log(data.player)
         console.log(player.playerNumber)
         console.log(data.points)
-        data.player === player.playerNumber ? ownPoints.innerHTML = Number(ownPoints.innerHTML) + data.points : oppPoints.innerHTML = Number(oppPoints.innerHTML) + data.points;
+        data.player === player.playerNumber ? ownPoints.innerHTML = data.points : oppPoints.innerHTML = data.points;
     }
 
-    updateRoundPoints(target) {
-        target == player.number ? this.ownRounds.innerHTML = Number(this.ownRounds.innerHTML) + 1 : this.oppRounds.innerHTML = Number(this.oppRounds.innerHTML) + 1;
+    updateRoundPoints(targetPlayer) {
+        targetPlayer.number == player.playerNumber ? this.ownRounds.innerHTML = targetPlayer.roundPoints : this.oppRounds.innerHTML = targetPlayer.roundPoints;
     }
 
     resetRound(winner) {
@@ -200,7 +309,7 @@ class GameScene {
         this.ownPile.innerHTML = '';
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
-        this.updateRoundPoints(winner.number);
+        this.updateRoundPoints(winner);
 
         let ownCards = this.hand.getElementsByClassName('card');
         console.log(ownCards)
@@ -208,7 +317,7 @@ class GameScene {
             ownCards[0].parentNode.removeChild(ownCards[0]);
         }
 
-        let oppCards = this.opponentHand.getElementsByClassName('card');
+        let oppCards = this.opponentHand.getElementsByClassName('opp-card');
 
         while(oppCards[0]) {
             oppCards[0].parentNode.removeChild(oppCards[0]);
