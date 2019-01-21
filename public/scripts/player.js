@@ -2,7 +2,6 @@ class Player {
     constructor(number) {
         this.playArena = document.getElementById('play-arena');
         this.hand = document.getElementById('own-hand');
-        this.pile = document.getElementById('own-pile');
         this.cardPile = document.getElementById('card-pile');
         this.points = 0;
         this.swapCard;

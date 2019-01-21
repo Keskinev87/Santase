@@ -9,8 +9,6 @@ class GameScene {
         this.playField = document.getElementById('play-field');
         this.playArena = document.getElementById('play-arena');
         this.cardPile = document.getElementById('card-pile');
-        this.opponentPile = document.getElementById('opponent-pile');
-        this.ownPile = document.getElementById('own-pile');
         this.hand = document.getElementById('own-hand'); //player's hand - the cards will be visible
         this.opponentHand = document.getElementById('opponent-hand'); //opponent's hand - cards will not be visible
         this.messages = document.getElementById('messages');
@@ -199,8 +197,8 @@ class GameScene {
                 newCard.setAttribute('data-pos', index);
                 newCard.setAttribute('data-name', cardName);
                 newCard.setAttribute('data-suit', card.suit);
-                newCard.style.left = index * 13 + '%';
-                newCard.style.top = '15%';
+                newCard.style.left = index * 15 + '%';
+                newCard.style.top = '10%';
         
                 resolve(newCard);
             } else if(type =="opponent") {
@@ -208,8 +206,8 @@ class GameScene {
     
                 newCard.setAttribute("src", cardback);
                 newCard.classList.add('opp-card');
-                newCard.style.left = index * 13 + '%';
-                newCard.style.top = '15%';
+                newCard.style.left = index * 15 + '%';
+                newCard.style.top = "-30%";
                 
                 resolve(newCard);
             } else {
@@ -264,9 +262,6 @@ class GameScene {
     
         pileCard.setAttribute("src", cardback);
         pileCard.classList.add('pile-card');
-
-        this.ownPile.appendChild(pileCard.cloneNode());
-        this.opponentPile.appendChild(pileCard.cloneNode());
         
         let trumpPileCard = pileCard.cloneNode();
         trumpPileCard.setAttribute('id', 'play-pile-card')
@@ -305,8 +300,6 @@ class GameScene {
     resetRound(winner) {
         this.playArena.innerHTML='';
         this.cardPile.innerHTML ='';
-        this.opponentPile.innerHTML ='';
-        this.ownPile.innerHTML = '';
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
         this.updateRoundPoints(winner);

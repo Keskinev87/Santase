@@ -119,36 +119,35 @@ body {
 .oponent-area{
   position: absolute;
   top: 0;
-  height: 30%;
+  height: 20%;
   width: 100%;
 }
 
 #opponent-hand {
     position: absolute;
-    width: 70%;
+    width: 100%;
     height: 100%;
     left: 0;
 }
 
-#opponent-pile {
+.opp-card {
     position: absolute;
-    width: 30%;
-    left: 70%;
-    height: 100%;
+    width: 20%;
+    height: auto;
 }
 
-#opponent-pile .pile-card {
+.opponent-name {
     position: absolute;
-    top: 15%;
-    width: 70%;
-    left: 15%;
-    height: auto;
+    left: 0;
+    top: 60%;
+    height: 10%;
+    width: 100%;
 }
 
 .opponent-points, .opponent-rounds-won, .opponent-games-won {
     position: absolute;
-    top: 90%;
-    height: 15%;
+    top: 80%;
+    height: 20%;
     width: 33%;
 }
 
@@ -160,18 +159,12 @@ body {
     left: 67%;
 }
 
-.opponent-name {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 10%;
-    width: 100%;
-}
+
 
 .play-field {
   position: absolute;
-  top:30%;
-  height: 35%;
+  top:20%;
+  height: 30%;
   width: 100%;
   background: #5C821A;
   border-top: 2px solid #0F1B07;
@@ -207,45 +200,37 @@ body {
 
 .own-area {
   position: absolute;
-  top: 65%;
+  top: 50%;
   height: 30%;
   width: 100%;
 }
 
 #own-hand {
     position: absolute;
-    width: 70%;
+    width: 100%;
     height: 100%;
     left: 0;
 }
 
-#own-pile {
+.card {
     position: absolute;
-    width: 30%;
-    left: 70%;
-    height: 100%;
-}
-
-#own-pile .pile-card {
-    position: absolute;
-    top: 15%;
-    width: 70%;
-    left: 15%;
+    width: 20%;
     height: auto;
+    cursor: -webkit-grab;
 }
 
 .player-name {
     position: absolute;
-    top:0;
     left: 0;
-    width:100%;
+    top: 70%;
     height: 10%;
+    width: 100%;
 }
 
 .own-points, .own-rounds-won, .own-games-won {
     position: absolute;
-    bottom: 0;
-    height: 15%;
+    top: 80%;
+    height: 20%;
     width: 33%;
 }
 
@@ -259,8 +244,8 @@ body {
 
 .controls-container{
     position: absolute;
-    top: 95%;
-    height: 5%;
+    top: 70%;
+    height: 10%;
     width: 100%;
 }
 
@@ -279,8 +264,8 @@ body {
 
 .chat-container {
     position: absolute;
-    top: 90%;
-    height: 10%;
+    top: 80%;
+    height: 20%;
     width: 100%;
     padding: 0;
     border-top: 1px solid #0F1B07;
@@ -312,20 +297,6 @@ body {
 
 .status-msg {
     color:#FFFFFF;
-}
-
-.card {
-    position: absolute;
-    width: 30%;
-    height: auto;
-    cursor: -webkit-grab;
-}
-
-.opp-card {
-    position: absolute;
-    width: 30%;
-    height: auto;
-    cursor: -webkit-grab;
 }
 
 .played-card {
