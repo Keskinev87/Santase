@@ -207,7 +207,7 @@ class GameScene {
                 newCard.setAttribute("src", cardback);
                 newCard.classList.add('opp-card');
                 newCard.style.left = index * 15 + '%';
-                newCard.style.top = "-30%";
+                newCard.style.top = 0;
                 
                 resolve(newCard);
             } else {

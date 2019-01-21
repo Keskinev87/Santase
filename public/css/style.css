@@ -1,4 +1,7 @@
 @media only screen and (max-width: 600px) {
+    body {
+        font-size: 3vw;
+    }
     .menu, .game-host-join-form {
         position: absolute;
         height: 30%;
@@ -119,7 +122,7 @@ body {
 .oponent-area{
   position: absolute;
   top: 0;
-  height: 20%;
+  height: 30%;
   width: 100%;
 }
 
@@ -139,7 +142,7 @@ body {
 .opponent-name {
     position: absolute;
     left: 0;
-    top: 60%;
+    top: 70%;
     height: 10%;
     width: 100%;
 }
@@ -163,7 +166,7 @@ body {
 
 .play-field {
   position: absolute;
-  top:20%;
+  top:30%;
   height: 30%;
   width: 100%;
   background: #5C821A;
@@ -200,7 +203,7 @@ body {
 
 .own-area {
   position: absolute;
-  top: 50%;
+  top: 60%;
   height: 30%;
   width: 100%;
 }
