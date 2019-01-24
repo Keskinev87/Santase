@@ -1,5 +1,6 @@
 class GameScene {
     constructor() {
+        this.nickNameForm = document.getElementById('nickname-form');
         this.chatForm = document.getElementById('chat-form'); //get the typed message
         this.menu = document.getElementById('menu');
         this.gameScene = document.getElementById('game-container');
@@ -16,16 +17,18 @@ class GameScene {
         this.oppPoints = document.getElementById('opp-pts');
         this.oppRounds = document.getElementById('opp-rounds-won');
         this.ownRounds = document.getElementById('own-rounds-won');
+        this.ownGamePointsCounter = document.getElementById('own-games-won');
+        this.oppGamePointsCounter = document.getElementById('opp-games-won');
         this.hostPrivateRoomBtn = document.getElementById('host-private-room');
         this.joinPrivateRoomBtn = document.getElementById('join-private-room');
         this.gameHostJoinForm = document.getElementById('game-host-join-form');
+        this.setNickNameForm = document.getElementById('set-nickname-form');
+        this.turnNumber = 0;
         this.trumpChangeAllowed = false;
         this.trumpSuit;
         this.room;
         this.myTurn = false;
         this.status = '';
-        
-        
         this.latesttap;
     }
 
@@ -45,10 +48,14 @@ class GameScene {
                 gameScene.latesttap = new Date().getTime();
 
             })
+
+            this.setNickNameForm.addEventListener('submit', function(event){
+                gameScene.setNickName(event);
+            })
         
             this.gameJoinBtn.addEventListener('click', function() {
                 gameScene.showGameScene();
-                socket.emit('join game');
+                socket.emit('join game', player.nickName);
             })
 
             this.hostPrivateRoomBtn.addEventListener('click', function(event){
@@ -66,6 +73,25 @@ class GameScene {
         })
     }
 
+    setNickName(e) {
+        e.preventDefault();
+        let nickName = document.getElementById('nickname-input').value;
+        let nickNameErr = document.getElementById('nickname-error');
+
+        if(!nickName){
+            nickNameErr.innerHTML = "Please enter some nickname";
+            nickNameErr.style.visibility = '';
+        } else {
+            player.nickName = nickName;
+            this.setNickNameForm.style.visibility = 'hidden';
+            this.showMenu();
+        }
+    }
+
+    showMenu(){
+        this.menu.style.visibility = '';
+    }
+
     showHostJoinForm(mode, e) {
         e.preventDefault();
         this.menu.style.visibility = 'hidden';
@@ -73,45 +99,31 @@ class GameScene {
         if(mode === 'host') {
            this.gameHostJoinForm.addEventListener('submit', function(event) {
                event.preventDefault();
-               let nickName = document.getElementById('nickname-input').value;
+               
                let gameCode = document.getElementById('roomcode-input').value;
-               let nickNameErr = document.getElementById('nickname-error');
                let gameCodeErr = document.getElementById('roomcode-error');
-
-               if(!nickName){
-                    nickNameErr.innerHTML = "Please enter some nickname";
-                    nickNameErr.style.visibility = '';
-               }
 
                if(!gameCode){
                     gameCodeErr.innerHTML = "Please enter the code of the room you want to join";
                     gameCodeErr.style.visibility = '';
                } 
                gameScene.showGameScene();
-               socket.emit('host private room', {nickname: nickName, gameCode: gameCode});
-               console.log(nickName, gameCode);
-               
+               socket.emit('host private room', {nickname: player.nickName, gameCode: gameCode});
+               console.log(player.nickName, gameCode);
            })
         } else if(mode === 'join') {
             this.gameHostJoinForm.addEventListener('submit', function(event){
                 event.preventDefault();
-                let nickName = document.getElementById('nickname-input').value;
                 let gameCode = document.getElementById('roomcode-input').value;
-                let nickNameErr = document.getElementById('nickname-error');
                 let gameCodeErr = document.getElementById('roomcode-error');
-
-                if(!nickName){
-                        nickNameErr.innerHTML = "Please enter some nickname";
-                        nickNameErr.style.visibility = '';
-                }
 
                 if(!gameCode){
                         gameCodeErr.innerHTML = "Please enter the code of the room you want to join";
                         gameCodeErr.style.visibility = '';
                 } 
                 gameScene.showGameScene();
-                socket.emit('join private room', {nickName: nickName, gameCode: gameCode});
-                console.log(nickName, gameCode);
+                socket.emit('join private room', {nickName: player.nickName, gameCode: gameCode});
+                console.log(player.nickName, gameCode);
             })
         }
         
@@ -133,13 +145,9 @@ class GameScene {
     announce(message) {
         let announcementMsg = document.getElementById('announcement');
         let announcementContainer = document.getElementById('announcement-container');
-        console.log(announcementMsg)
-        console.log(announcementContainer)
 
         announcementMsg.innerHTML = message;
         announcementContainer.style.visibility = '';
-        console.log(announcementMsg)
-        console.log(announcementContainer)
 
         setTimeout(function() {
             announcementContainer.style.visibility = 'hidden';
@@ -167,10 +175,16 @@ class GameScene {
     allowTrumpChange() {
         //allows the change of the trump for the current player
         console.log("Should be enabled");
+            let trumpCard = document.getElementsByClassName('trump-card')[0];
+            trumpCard.addEventListener('click', function() {
+                player.swapTrumpCard();
+            }); 
+    }
+
+    swapTrump(card) {
         let trumpCard = document.getElementsByClassName('trump-card')[0];
-        trumpCard.addEventListener('click', function() {
-            player.swapTrumpCard();
-        });
+        trumpCard.parentElement.removeChild(trumpCard);
+        this.dealTrumpCard(card);
     }
 
     clearPlayArena() {
@@ -288,9 +302,6 @@ class GameScene {
     updatePoints(data) {
         let ownPoints = document.getElementById('own-pts');
         let oppPoints = document.getElementById('opp-pts');   
-        console.log(data.player)
-        console.log(player.playerNumber)
-        console.log(data.points)
         data.player === player.playerNumber ? ownPoints.innerHTML = data.points : oppPoints.innerHTML = data.points;
     }
 
@@ -298,11 +309,20 @@ class GameScene {
         targetPlayer.number == player.playerNumber ? this.ownRounds.innerHTML = targetPlayer.roundPoints : this.oppRounds.innerHTML = targetPlayer.roundPoints;
     }
 
+    awardGamePoints(playerWon){
+        if(playerWon.number === player.playerNumber) {
+            this.ownGamePointsCounter.innerHTML = playerWon.gamePoints; 
+        } else {
+            this.oppGamePointsCounter.innerHTML = playerWon.gamePoints;
+        }
+    }
+
     resetRound(winner) {
         this.playArena.innerHTML='';
         this.cardPile.innerHTML ='';
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
+        this.turnNumber = 0;
         this.updateRoundPoints(winner);
 
         let ownCards = this.hand.getElementsByClassName('card');

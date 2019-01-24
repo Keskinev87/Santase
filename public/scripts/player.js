@@ -1,17 +1,18 @@
 class Player {
     constructor(number) {
+        this.nickName;
+        this.playerNumber = number; //player1 or player2;
         this.playArena = document.getElementById('play-arena');
         this.hand = document.getElementById('own-hand');
         this.cardPile = document.getElementById('card-pile');
         this.points = 0;
         this.swapCard;
-        this.playerNumber = number; //player1 or player2;
         this.lastPlayedCardPos;
     }
 
     playCard(id) {
         let card = document.getElementById(id);
-        
+        console.log("Playing first card")
         card.style.left = 0;
         card.classList.remove('card')
         card.classList.add('played-card');
@@ -19,30 +20,34 @@ class Player {
         this.checkForAnnouncement(id);
         this.playArena.appendChild(card);
         this.disableOwnHand();
+        console.log("Sending card played")
+        console.log(player)
         socket.emit('card played', {room: gameScene.room, card: id, player: this.playerNumber});
     }
 
     swapTrumpCard() {
-        socket.emit('changed trump card', {room: gameScene.room, player: this.playerNumber, ownTrump: this.swapCard});
-        let trumpCard = document.getElementsByClassName('trump-card')[0];
-        let ownTrump = document.getElementById(this.swapCard.number);
+        if(gameScene.turnNumber > 1) {
+            let trumpCard = document.getElementsByClassName('trump-card')[0];
+            let ownTrump = document.getElementById(this.swapCard.number);
+    
+            trumpCard.style.top = "15%"
+            trumpCard.style.left = ownTrump.dataset.pos * 13 + '%';
+            trumpCard.classList.remove('trump-card');
+            trumpCard.classList.add('card')
+            trumpCard.setAttribute('data-pos', ownTrump.dataset.pos);
+    
+            ownTrump.style.removeProperty('top');
+            ownTrump.style.removeProperty('left');
+            ownTrump.classList.remove('card');
+            ownTrump.classList.add('trump-card');
+            
+            this.hand.appendChild(trumpCard);
+            this.cardPile.appendChild(ownTrump);
 
-        trumpCard.style.top = "15%"
-        trumpCard.style.left = ownTrump.dataset.pos * 13 + '%';
-        trumpCard.classList.remove('trump-card');
-        trumpCard.classList.add('card')
-        trumpCard.setAttribute('data-pos', ownTrump.dataset.pos);
-
-        ownTrump.style.removeProperty('top');
-        ownTrump.style.removeProperty('left');
-        ownTrump.classList.remove('card');
-        ownTrump.classList.add('trump-card');
-        
-        this.hand.appendChild(trumpCard);
-        this.cardPile.appendChild(ownTrump);
-
-        this.swapCard = {};
-        this.reorderHand();
+            socket.emit('changed trump card', {room: gameScene.room, player: this.playerNumber, ownTrump: this.swapCard});
+            this.swapCard = {};
+            this.reorderHand();
+        }
     }
 
     createPileCard() {
@@ -224,11 +229,15 @@ class Player {
     }
 
     checkForAnnouncement(id) {
-        console.log(this.playArena.hasChildNodes());
+        console.log("Checking for announcement")
+        console.log(this.playArena)
+        console.log(this.playArena.hasChildNodes())
         if(!this.playArena.hasChildNodes()) { //it has to be your turn to announce 
+            console.log("It is my turn")
             let playerCard = cards[id];
             
             let cardsInHand = document.getElementById("own-hand").querySelectorAll(".card");
+            console.log(cardsInHand);
     
             if(playerCard.power == 3 || playerCard.power == 4) {
                 for (let cardInHand of cardsInHand) {

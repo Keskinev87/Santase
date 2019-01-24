@@ -2,12 +2,12 @@
     body {
         font-size: 3vw;
     }
-    .menu, .game-host-join-form {
+    .menu, .menu-form {
         position: absolute;
         height: 30%;
-        width: 100%;
+        width: 80%;
         top: 35%;
-        left: 0;
+        left: 10%;
         border-radius: 5px;
         color: #FFFFFF;
         background-color: #0f1b07;
@@ -15,7 +15,7 @@
 }
 
 @media only screen and (min-width: 601px) {
-    .menu, .game-host-join-form {
+    .menu, .menu-form {
         position: absolute;
         height: 30%;
         width: 50%;
@@ -47,7 +47,19 @@ body {
     border-radius: 3px;
 }
 
-.play-button{
+.submit-button {
+    position: absolute;
+    top: 80%;
+    left: 30%;
+    height: 15%;
+    width: 40%;
+    background-color: #5c821a;
+    color: #FFFFFF;
+    border-style: none;
+    border-radius: 3px;
+}
+
+.play-button {
     top: 14%;
 }
 
@@ -90,13 +102,20 @@ body {
 .form-field-nickname, .form-field-gamecode {
     position: absolute;
     width: 60%;
-    height: 25%;
+    height: 50%;
+    top: 10%;
     left: 20%;
+    font-size: 20px;
+    text-align: center;
 }
 
-.form-field-gamecode {
-    top: 35%;
+.game-input {
+    width: 100%;
+    padding: 4px 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
 }
+
 
 .input-error {
     font-size: small;

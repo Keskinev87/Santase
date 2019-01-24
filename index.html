@@ -6,7 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   </head>
   <body>
-    <div class="menu" id="menu">
+    <form class="menu-form" id="set-nickname-form" action="">
+        <div class="form-field-nickname">
+            <p>Enter your nickname</p>
+            <input type="text" class="game-input" id="nickname-input" value="">
+            <p class="input-error" id="nickname-error" style="visibility: hidden"></p>
+        </div>
+        <button type="submit" class="submit-button">Play</button>
+    </form>
+
+    <div class="menu" id="menu" style="visibility: hidden">
         <button type="button" class="play-button" id="join-game">Play Random Player</button>
         <button type="button" class="create-private-button" id="host-private-room">Host Private Room</button>
         <button type="button" class="join-private-button" id="join-private-room">Join Private Room</button>
@@ -14,19 +23,14 @@
     </div>
 
     
-    <form class="game-host-join-form" id="game-host-join-form" style="visibility: hidden" action="">
-        <button class="form-close-button" onclick="gameScene.closeForm(event);">X</button>
-        <div class="form-field-nickname">
-            <p>Enter your nickname</p>
-            <input type="text" class="game-input" id="nickname-input" value="">
-            <p class="input-error" id="nickname-error" style="visibility: hidden"></p>
-        </div>
+    <form class="menu-form" id="game-host-join-form" style="visibility: hidden" action="">
+        <button class="form-close-button" onclick="gameScene.closeForm(event);">X</button> 
         <div class="form-field-gamecode">
             <p>Enter the code of the room:</p>  
             <input type="text" class="game-input" autocomplete="off" id="roomcode-input" value="">
             <p class="input-error" id="roomcode-error" style="visibility: hidden">The code you provided is not correct</p>  
         </div>
-        <button type="submit" class="host-join-button">Play</button>
+        <button type="submit" class="submit-button">Play</button>
     </form>
     
 
@@ -42,9 +46,7 @@
             </div>
             <div class="play-field text-center" id="play-field" >
                 <div class="announcement-container" id="announcement-container" style="visibility: hidden"><p id="announcement"></p></div>
-                <div id="play-arena">
-                   
-                </div>
+                <div id="play-arena"></div>
                 <div id="card-pile">
                     
                 </div>

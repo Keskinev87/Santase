@@ -21,6 +21,8 @@ function main () {
         })
     
         socket.on('room joined', function(data){
+            console.log("Room joined")
+            console.log(data)
             gameScene.room = data.roomNumber;
             player.playerNumber = data.playerNumber;
         })
@@ -36,11 +38,13 @@ function main () {
 
         socket.on('play', function(cardPlayed, stage){
             player.enableOwnHand(cardPlayed, stage);
+            gameScene.turnNumber++;
             gameScene.displayStatusMsg("Your turn...");
         })
 
         socket.on('wait', function(msg){
             player.disableOwnHand();
+            gameScene.turnNumber++;
             gameScene.displayStatusMsg("Waiting for the other player...");
         })
 
@@ -76,6 +80,7 @@ function main () {
         })
 
         socket.on('trump card changed', function(card){
+            console.log(card);
             gameScene.swapTrump(card);
         })
 
@@ -92,6 +97,10 @@ function main () {
         socket.on('closed', function(player){
             console.log("Closed announced");
             gameScene.handleClosed(player);
+        })
+
+        socket.on('game won', function(playerWon) {
+            gameScene.awardGamePoints(playerWon);
         })
     
         socket.on('error', function(error) {
