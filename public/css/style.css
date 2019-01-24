@@ -105,15 +105,14 @@ body {
     height: 50%;
     top: 10%;
     left: 20%;
-    font-size: 20px;
+    font-size: 16px;
     text-align: center;
 }
 
 .game-input {
     width: 100%;
-    padding: 4px 8px;
-  margin: 8px 0;
-  box-sizing: border-box;
+    padding: 3px 8px;
+    box-sizing: border-box;
 }
 
 
