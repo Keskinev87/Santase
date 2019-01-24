@@ -125,6 +125,7 @@ class GameScene {
 
 
     showGameScene() {
+        this.launchIntoFullscreen(document.documentElement);
         this.gameScene.style.visibility = '';
         this.menu.style.visibility = 'hidden';
     }
@@ -346,6 +347,27 @@ class GameScene {
     scrollToBottom() {
       messages.scrollTop = messages.scrollHeight;
     }
+
+    launchIntoFullscreen(element) {
+        return new Promise((resolve, reject) => {
+            if(element.requestFullscreen) {
+                element.requestFullscreen();
+                resolve();
+              } else if(element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+                resolve();
+              } else if(element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+                resolve();
+              } else if(element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+                resolve();
+              } else {
+                  reject();
+              }
+        })
+        
+     }
 
     resizeGame () {
         console.log("Resizing")
