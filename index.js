@@ -53,24 +53,23 @@ io.on('connection', function(socket){
         socket.join(room.number);
         room.player1 = new Player(socket.id, 'player1', data.nickName);
         room.sendJoinedRoomStatus('player1');
-        room.sendStatusMsg('Waiting for another player')
-        privateWaitingRooms[data.gameCode] = room
-        console.log('Created Private room')
+        room.sendStatusMsg('Изчакване на друг играч...')
+        privateWaitingRooms[data.gameCode] = room;
         roomCounter++;
     })
 
     socket.on('join private room', function(data){
         
         if(privateWaitingRooms[data.gameCode] !== undefined) {
-            console.log("Joining room")
             let gameRoom = privateWaitingRooms[data.gameCode];
+
             gameRoom.player2 = new Player(socket.id, 'player2', data.nickName); //set the second player in the room
             privatePlayingRooms[data.gameCode] = gameRoom //move the room from waiting to playing
             delete privateWaitingRooms[data.gameCode];
             socket.join(gameRoom.number); //join the socket to the room's number
             gameRoom.sendJoinedRoomStatus('player2'); //send the number of the room to the front-end
             gameRoom.sendStatusMsg(gameRoom.player2.nickName + ' joined'); //let the players know, that the second player has joined
-            gameRoom.sendStatusMsg('The game will begin in 5 seconds...'); //let the players know when the game will start
+            gameRoom.sendStatusMsg('Играта започва...'); //let the players know when the game will start
                 
             setTimeout(function() {
                 gameRoom.startGame();
@@ -91,7 +90,7 @@ io.on('connection', function(socket){
     
                 gameRoom.sendJoinedRoomStatus('player2'); //send the number of the room to the front-end
                 gameRoom.sendStatusMsg(gameRoom.player2.nickName + ' joined'); //let the players know, that the second player has joined
-                gameRoom.sendStatusMsg('The game will begin in 5 seconds...'); //let the players know when the game will start
+                gameRoom.sendStatusMsg('Играта започва...'); //let the players know when the game will start
                 
                 setTimeout(function() {
                     gameRoom.startGame();
@@ -104,12 +103,12 @@ io.on('connection', function(socket){
                 room.player1 = new Player(socket.id, 'player1', nickName);
     
                 room.sendJoinedRoomStatus('player1');
-                room.sendStatusMsg('Waiting for another player')
+                room.sendStatusMsg('Изчакване за друг играч...')
                 waitingRooms.unshift(room);
                 roomCounter++;
             }
         } else {
-            io.sockets.to(socket.id).emit('error', 'You already joined the room')
+            io.sockets.to(socket.id).emit('error', 'Вече сте в стая!')
         }
         
        
@@ -269,13 +268,13 @@ class Room {
         this[player].cardPlayed = card;
         //if both players have made their play, compare their cards to see who wins the turn
         if(this.player1.cardPlayed !== undefined && this.player2.cardPlayed !== undefined) {
-            this.sendStatusMsg(`${this[player].nickName} played ${card.name} of ${card.suit}`);
+            this.sendStatusMsg(`${this[player].nickName} игра ${card.name} of ${card.suit}`);
             this.sendPlayToOpponent(this[player], this[opponent] ); //send the play to the opponent
             this.compareCards(this[opponent], this[player]); //compare the cards and decide who wins the turn. We have to pass who played first - this would be the opponent if we are here
         } else {
             this.sendPlayToOpponent(this[player], this[opponent]);
             this.sendPlay(this[opponent], this[player].cardPlayed, this.stage); //the method requires the opponent and the hand of the player so it can determine which cards are allowed. 
-            this.sendStatusMsg(`${this[player].nickName} played ${card.name} of ${card.suit}`);
+            this.sendStatusMsg(`${this[player].nickName} игра ${card.name} of ${card.suit}`);
             this.sendWait(this[player])
         }
 
@@ -332,7 +331,7 @@ class Room {
 
     endTurn(winner, loser) {
         
-        this.sendStatusMsg(`${winner.nickName} wins the round`); //send status message with the winner
+        this.sendStatusMsg(`${winner.nickName} печели ръката`); //send status message with the winner
         io.sockets.to(winner.id).emit('collect cards'); //send event to collect the cards from the play arena
         io.sockets.to(loser.id).emit('clear play area'); //send event to clear the play arena
         
@@ -349,7 +348,6 @@ class Room {
             if(this.stage === 'pile-over') 
                 this.endRound(winner, loser);
             else if(this.stage === 'closed') {
-                console.log("the player who closed did not make 66");
                 let winnerFromClosed = this.getOpponent(this.playerClosed);
                 this.endRound(this[winnerFromClosed], this[this.playerClosed]); //the player who closed didn't make 66
             }
@@ -361,7 +359,6 @@ class Room {
     }
 
     endRound(winner, loser){
-        console.log("Tochkuvane")
         if(loser.number === this.playerClosed) {
             winner.roundPoints += 3; //the player who closed didn't make 66
         } else {
@@ -376,10 +373,8 @@ class Room {
         if(winner.roundPoints >= 11) {
             winner.roundPoints = 0;
             winner.gamePoints++;
-            console.log(winner.points)
-            console.log("Ending game")
             io.sockets.to(this.number).emit("game won", winner);
-            this.sendStatusMsg(`${winner.nickName} wins...`);
+            this.sendStatusMsg(`${winner.nickName} печели раздаването...`);
         }
         
 
@@ -400,8 +395,8 @@ class Room {
         this.stage = 'initial';
 
         io.sockets.to(this.number).emit("end round", winner);
-        this.sendStatusMsg(`${winner.nickName} wins...`);
-        this.sendStatusMsg("Starting new round...");
+        this.sendStatusMsg(`${winner.nickName} печели раздаването...`);
+        this.sendStatusMsg("Започва ново раздаване...");
 
         let self = this;
         setTimeout(function(){
@@ -479,7 +474,13 @@ class Room {
     }
 
     sendJoinedRoomStatus(player) {
-        io.sockets.to(this[player].id).emit('room joined', {roomNumber: this.number, playerNumber: player});
+        let opponent = this.getOpponent(player);
+        if (this[opponent]){
+            io.sockets.to(this[player].id).emit('room joined', {roomNumber: this.number, playerNumber: player, opponentsNickName: this[opponent].nickName});
+            io.sockets.to(this[opponent].id).emit('room joined', {roomNumber: this.number, playerNumber: opponent, opponentsNickName: this[player].nickName});
+        }   
+        else
+            io.sockets.to(this[player].id).emit('room joined', {roomNumber: this.number, playerNumber: player, opponentsNickName: ''});
     }
         
 }

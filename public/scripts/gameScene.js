@@ -77,12 +77,14 @@ class GameScene {
         e.preventDefault();
         let nickName = document.getElementById('nickname-input').value;
         let nickNameErr = document.getElementById('nickname-error');
+        let nickNameHolder = document.getElementById('own-name')
 
         if(!nickName){
-            nickNameErr.innerHTML = "Please enter some nickname";
+            nickNameErr.innerHTML = "Моля въведете име!";
             nickNameErr.style.visibility = '';
         } else {
             player.nickName = nickName;
+            nickNameHolder.innerHTML = nickName;
             this.setNickNameForm.style.visibility = 'hidden';
             this.showMenu();
         }
@@ -104,7 +106,7 @@ class GameScene {
                let gameCodeErr = document.getElementById('roomcode-error');
 
                if(!gameCode){
-                    gameCodeErr.innerHTML = "Please enter the code of the room you want to join";
+                    gameCodeErr.innerHTML = "Моля въведете кода на стаята!";
                     gameCodeErr.style.visibility = '';
                } 
                gameScene.showGameScene();
@@ -118,7 +120,7 @@ class GameScene {
                 let gameCodeErr = document.getElementById('roomcode-error');
 
                 if(!gameCode){
-                        gameCodeErr.innerHTML = "Please enter the code of the room you want to join";
+                        gameCodeErr.innerHTML = "Моля въведете кода на стаята";
                         gameCodeErr.style.visibility = '';
                 } 
                 gameScene.showGameScene();
@@ -212,7 +214,7 @@ class GameScene {
                 newCard.setAttribute('data-pos', index);
                 newCard.setAttribute('data-name', cardName);
                 newCard.setAttribute('data-suit', card.suit);
-                newCard.style.left = index * 15 + '%';
+                newCard.style.left = (index * 15 + 2)  + '%';
                 newCard.style.top = '10%';
         
                 resolve(newCard);
@@ -221,7 +223,7 @@ class GameScene {
     
                 newCard.setAttribute("src", cardback);
                 newCard.classList.add('opp-card');
-                newCard.style.left = index * 15 + '%';
+                newCard.style.left = (index * 15 + 2) + '%';
                 newCard.style.top = 0;
                 
                 resolve(newCard);

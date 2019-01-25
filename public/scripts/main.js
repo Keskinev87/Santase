@@ -23,6 +23,8 @@ function main () {
         socket.on('room joined', function(data){
             console.log("Room joined")
             console.log(data)
+            let opponentsNameHolder = document.getElementById('opp-name');
+            opponentsNameHolder.innerHTML = data.opponentsNickName;
             gameScene.room = data.roomNumber;
             player.playerNumber = data.playerNumber;
         })
@@ -45,7 +47,7 @@ function main () {
         socket.on('wait', function(msg){
             player.disableOwnHand();
             gameScene.turnNumber++;
-            gameScene.displayStatusMsg("Waiting for the other player...");
+            gameScene.displayStatusMsg("Изчакване на друг играч...");
         })
 
         socket.on('draw card', function(card) {

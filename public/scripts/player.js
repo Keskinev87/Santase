@@ -12,7 +12,6 @@ class Player {
 
     playCard(id) {
         let card = document.getElementById(id);
-        console.log("Playing first card")
         card.style.left = 0;
         card.classList.remove('card')
         card.classList.add('played-card');
@@ -20,8 +19,6 @@ class Player {
         this.checkForAnnouncement(id);
         this.playArena.appendChild(card);
         this.disableOwnHand();
-        console.log("Sending card played")
-        console.log(player)
         socket.emit('card played', {room: gameScene.room, card: id, player: this.playerNumber});
     }
 
@@ -229,9 +226,6 @@ class Player {
     }
 
     checkForAnnouncement(id) {
-        console.log("Checking for announcement")
-        console.log(this.playArena)
-        console.log(this.playArena.hasChildNodes())
         if(!this.playArena.hasChildNodes()) { //it has to be your turn to announce 
             console.log("It is my turn")
             let playerCard = cards[id];
@@ -253,16 +247,14 @@ class Player {
     announceTwenty() {
         socket.emit('announcement', {room: gameScene.room, player: this.playerNumber, points: 20});
         
-        gameScene.announce('I announce 20');
-        console.log("player to update")
-        console.log(this.number)
+        gameScene.announce('Обявявам 20');
         gameScene.updatePoints({player: this.playerNumber, points: 20});
         
     }
 
     announceForty() {
         socket.emit('announcement', {room: gameScene.room, player: this.playerNumber, points: 40});
-        gameScene.announce('I announce 40');
+        gameScene.announce('Обявявам 40');
         console.log("player to update")
         console.log(this.number)
         gameScene.updatePoints({player: this.playerNumber, points: 40});
