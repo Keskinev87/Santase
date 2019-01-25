@@ -22,7 +22,7 @@ function main () {
     
         socket.on('room joined', function(data){
             let opponentsNameHolder = document.getElementById('opp-name');
-
+            
             opponentsNameHolder.innerHTML = data.opponentsNickName;
             gameScene.room = data.roomNumber;
             player.playerNumber = data.playerNumber;
@@ -83,6 +83,8 @@ function main () {
         })
 
         socket.on('end round', function(winner){
+            this.announce(winner.nickName + " печели раздаването")
+            gameScene.updateRoundPoints(winner);
             gameScene.resetRound(winner);
         })
 
@@ -98,6 +100,14 @@ function main () {
         socket.on('game won', function(playerWon) {
             gameScene.announce(playerWon.nickName + " печели играта");
             gameScene.awardGamePoints(playerWon);
+        })
+
+        socket.on('player left', function(msg) {
+            console.log("main.js")
+            gameScene.announce("Другият играч напусна стаята. Играта ще се затвори автоматично.");
+            setTimeout(function(){
+                gameScene.quitGame();
+            }, 4000);
         })
     
         socket.on('error', function(error) {

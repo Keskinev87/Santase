@@ -228,7 +228,7 @@ class GameScene {
                 newCard.setAttribute("src", cardback);
                 newCard.classList.add('opp-card');
                 newCard.style.left = (index * 15 + 2) + '%';
-                newCard.style.top = 0;
+                newCard.style.top = '2%';
                 
                 resolve(newCard);
             } else {
@@ -328,7 +328,6 @@ class GameScene {
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
         this.turnNumber = 1;
-        this.updateRoundPoints(winner);
 
         let ownCards = this.hand.getElementsByClassName('card');
         
@@ -341,9 +340,7 @@ class GameScene {
         while(oppCards[0]) {
             oppCards[0].parentNode.removeChild(oppCards[0]);
         };
-
-        this.announce(winner.nickName + " печели раздаването")
-       
+    
     }
 
     displayChatMsg(msg) {
@@ -373,6 +370,19 @@ class GameScene {
     
     scrollToBottom() {
       messages.scrollTop = messages.scrollHeight;
+    }
+
+    quitGame() {
+        console.log("quitGame")
+        this.resetRound();
+        this.gameScene.style.visibility = 'hidden';
+        this.showMenu();
+
+        let opponentsNameHolder = document.getElementById('opp-name');
+        opponentsNameHolder.innerHTML = '';
+        socket.emit('leave room', gameScene.room);
+        gameScene.room = undefined;
+        player.playerNumber = undefined;
     }
 
     launchIntoFullscreen(element) {

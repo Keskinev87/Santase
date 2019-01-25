@@ -51,6 +51,7 @@ io.on('connection', function(socket){
     socket.on('host private room', function(data) {
         let room = new Room(roomCounter, data.gameCode);
         socket.join(room.number);
+        socket.curRoom = room.number;
         room.player1 = new Player(socket.id, 'player1', data.nickName);
         room.sendJoinedRoomStatus('player1');
         room.sendStatusMsg('Изчакване на друг играч...')
@@ -67,6 +68,7 @@ io.on('connection', function(socket){
             privatePlayingRooms[data.gameCode] = gameRoom //move the room from waiting to playing
             delete privateWaitingRooms[data.gameCode];
             socket.join(gameRoom.number); //join the socket to the room's number
+            socket.curRoom = gameRoom.number;
             gameRoom.sendJoinedRoomStatus('player2'); //send the number of the room to the front-end
             gameRoom.sendStatusMsg(gameRoom.player2.nickName + ' joined'); //let the players know, that the second player has joined
             gameRoom.sendStatusMsg('Играта започва...'); //let the players know when the game will start
@@ -79,14 +81,17 @@ io.on('connection', function(socket){
     
     socket.on('join game', function(nickName) {
          //if the player is not in another room
+         console.log("Socket rooms")
+         console.log(socket.rooms)
          if(Object.keys(socket.rooms).length <= 1){
-
+           
             if(waitingRooms.length > 0) { //there are rooms with players waiting for another player to join
 
                 let gameRoom = waitingRooms.pop();
                 gameRoom.player2 = new Player(socket.id, 'player2', nickName); //set the second player in the room
                 playingRooms[gameRoom.number] = gameRoom //move the room from waiting to playing
                 socket.join(gameRoom.number); //join the socket to the room's number
+                socket.curRoom = gameRoom.number;
     
                 gameRoom.sendJoinedRoomStatus('player2'); //send the number of the room to the front-end
                 gameRoom.sendStatusMsg(gameRoom.player2.nickName + ' joined'); //let the players know, that the second player has joined
@@ -100,6 +105,7 @@ io.on('connection', function(socket){
     
                 let room = new Room(roomCounter);
                 socket.join(room.number); //join the game
+                socket.curRoom = room.number;
                 room.player1 = new Player(socket.id, 'player1', nickName);
     
                 room.sendJoinedRoomStatus('player1');
@@ -139,10 +145,20 @@ io.on('connection', function(socket){
         playingRooms[data.room].announceClosed(data.player);
     })
 
+    // socket.on('quitting', function(msg) {
+    //     console.log(msg);
+    //     console.log(socket.id);
+    //     console.log(socket.nsp.rooms);
+    // })
+
     socket.on('disconnect', function() {
-        console.log("A user disconnected");
-        console.log(socket.id);
-        console.log(socket.nsp.rooms);
+        io.sockets.to(socket.curRoom).emit('player left', "the player has left");
+        delete playingRooms[socket.curRoom];
+        
+    })
+
+    socket.on('leave room', function(room) {
+        socket.leave(room);
     })
  
 });
