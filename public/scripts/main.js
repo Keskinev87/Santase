@@ -21,9 +21,8 @@ function main () {
         })
     
         socket.on('room joined', function(data){
-            console.log("Room joined")
-            console.log(data)
             let opponentsNameHolder = document.getElementById('opp-name');
+
             opponentsNameHolder.innerHTML = data.opponentsNickName;
             gameScene.room = data.roomNumber;
             player.playerNumber = data.playerNumber;
@@ -40,14 +39,12 @@ function main () {
 
         socket.on('play', function(cardPlayed, stage){
             player.enableOwnHand(cardPlayed, stage);
-            gameScene.turnNumber++;
-            gameScene.displayStatusMsg("Your turn...");
+            gameScene.displayStatusMsg("Ваш ред е...");
         })
 
         socket.on('wait', function(msg){
             player.disableOwnHand();
-            gameScene.turnNumber++;
-            gameScene.displayStatusMsg("Изчакване на друг играч...");
+            gameScene.displayStatusMsg("Изчакване на другия играч...");
         })
 
         socket.on('draw card', function(card) {
@@ -71,8 +68,8 @@ function main () {
             gameScene.clearPlayArena();
         })
 
-        socket.on('announcement', function(points){
-            gameScene.announce(`I announce ${points}`)
+        socket.on('announcement', function(name, points){
+            gameScene.announce(`${name} обявява ${points}`)
             let opponent = player.playerNumber == 'player1' ? 'player2' : 'player1';
             gameScene.updatePoints({player: opponent, points:points});
         })
@@ -82,7 +79,6 @@ function main () {
         })
 
         socket.on('trump card changed', function(card){
-            console.log(card);
             gameScene.swapTrump(card);
         })
 
@@ -91,17 +87,16 @@ function main () {
         })
 
         socket.on('enable trump change', function(swapCard){
-            console.log("Enabling trump change");
             player.swapCard = swapCard;
             gameScene.allowTrumpChange();
         })
 
-        socket.on('closed', function(player){
-            console.log("Closed announced");
-            gameScene.handleClosed(player);
+        socket.on('closed', function(name){
+            gameScene.handleClosed(name);
         })
 
         socket.on('game won', function(playerWon) {
+            gameScene.announce(playerWon.nickName + " печели играта");
             gameScene.awardGamePoints(playerWon);
         })
     

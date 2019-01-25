@@ -17,6 +17,18 @@
     .announcement-container {
         font-size: 16px;
     }
+
+    .announcement-container {
+        position: absolute;
+        z-index: 2;
+        width: 40%;
+        left: 30%;
+        top: 30%;
+        height: 40%;
+        color: #B7B8B6;
+        background: #34675C;
+        text-align: center;
+    }
 }
 
 @media only screen and (min-width: 601px) {
@@ -34,6 +46,18 @@
     
     .announcement-container {
         font-size: 16px;
+    }
+
+    .announcement-container {
+        position: absolute;
+        z-index: 2;
+        width: 40%;
+        left: 30%;
+        top: 35%;
+        height: 30%;
+        color: #B7B8B6;
+        background: #34675C;
+        text-align: center;
     }
 }
 
@@ -210,18 +234,6 @@ body {
     width: 50%;
     height: 100%;
     left: 0;
-}
-
-.announcement-container {
-    position: absolute;
-    z-index: 2;
-    width: 40%;
-    left: 30%;
-    top: 40%;
-    height: 20%;
-    color: #B7B8B6;
-    background: #34675C;
-    text-align: center;
 }
 
 #card-pile {

@@ -236,16 +236,9 @@ class Room {
         let index = this[player].cards.map(function(e) { return e.number}).indexOf(card.number);
         let temp;
 
-        
-
         temp = this.playDeck[12]; //the current trump card
         this.playDeck[12] = this[player].cards[index]; //change the trump card
         this[player].cards[index] = temp; //change the player's card
-    
-        console.log("Cards of player")
-        console.log(this[player].cards)
-        console.log("New turmp")
-        console.log(this.playDeck[12])
 
         io.sockets.to(this[opponent].id).emit('trump card changed', card);
     }
@@ -432,16 +425,13 @@ class Room {
 
     announceClosed(player){
         this.playerClosed = player;
-        console.log("Player closed");
-        console.log(this.playerClosed)
-        
-        io.sockets.to(this.number).emit('closed', player);
         this.stage = 'closed';
+        io.sockets.to(this.number).emit('closed', this[player].nickName);
     }
 
     sendAnnouncement(player, points) {
         let opponent = this.getOpponent(player);
-        io.sockets.to(this[opponent].id).emit('announcement', points);
+        io.sockets.to(this[opponent].id).emit('announcement', this[player].nickName, points);
     }
         
     sendPlay(player, cardPlayed, stage) {
@@ -469,7 +459,6 @@ class Room {
     }
     
     sendStatusMsg(msg) {
-        
         io.sockets.to(this.number).emit('status message', msg);
     }
 

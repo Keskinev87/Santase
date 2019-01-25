@@ -67,6 +67,7 @@ class Player {
         for (let card of wonCards) {
             this.points += cards[card.id].power;
         }
+        gameScene.turnNumber++;
         gameScene.clearPlayArena();
     }
 
@@ -227,11 +228,8 @@ class Player {
 
     checkForAnnouncement(id) {
         if(!this.playArena.hasChildNodes()) { //it has to be your turn to announce 
-            console.log("It is my turn")
             let playerCard = cards[id];
-            
-            let cardsInHand = document.getElementById("own-hand").querySelectorAll(".card");
-            console.log(cardsInHand);
+            let cardsInHand = document.getElementById("own-hand").querySelectorAll(".card");;
     
             if(playerCard.power == 3 || playerCard.power == 4) {
                 for (let cardInHand of cardsInHand) {
@@ -247,17 +245,12 @@ class Player {
     announceTwenty() {
         socket.emit('announcement', {room: gameScene.room, player: this.playerNumber, points: 20});
         
-        gameScene.announce('Обявявам 20');
-        gameScene.updatePoints({player: this.playerNumber, points: 20});
-        
+        gameScene.announce('Обявявам 20');    
     }
 
     announceForty() {
         socket.emit('announcement', {room: gameScene.room, player: this.playerNumber, points: 40});
         gameScene.announce('Обявявам 40');
-        console.log("player to update")
-        console.log(this.number)
-        gameScene.updatePoints({player: this.playerNumber, points: 40});
     }
 
 }

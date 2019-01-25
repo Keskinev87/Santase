@@ -23,7 +23,7 @@ class GameScene {
         this.joinPrivateRoomBtn = document.getElementById('join-private-room');
         this.gameHostJoinForm = document.getElementById('game-host-join-form');
         this.setNickNameForm = document.getElementById('set-nickname-form');
-        this.turnNumber = 0;
+        this.turnNumber = 1;
         this.trumpChangeAllowed = false;
         this.trumpSuit;
         this.room;
@@ -159,10 +159,13 @@ class GameScene {
     } 
 
     announceClosed() {
-        socket.emit('closed', {room: gameScene.room, player: player.playerNumber});
+        console.log(this.turnNumber);
+        console.log(this.playArena.hasChildNodes())
+        if (!this.playArena.hasChildNodes() && this.turnNumber > 1)
+            socket.emit('closed', {room: gameScene.room, player: player.playerNumber});
     }
 
-    handleClosed(player) {
+    handleClosed(name) {
         let closedCardBack = document.getElementById('closed-card-back');
         let pileCard = document.getElementById('play-pile-card');
         let trumpCard = document.getElementsByClassName('trump-card')[0];
@@ -171,7 +174,7 @@ class GameScene {
         closedCardBack.style.visibility = '';
         pileCard.classList.add('disabled-card');
         trumpCard.classList.add('disabled-card');
-        this.announce(player + "closed");
+        this.announce(name + " затвори");
     }
 
     allowTrumpChange() {
@@ -190,9 +193,10 @@ class GameScene {
     }
 
     clearPlayArena() {
+        this.turnNumber++;
         while (this.playArena.hasChildNodes()) {   
             this.playArena.removeChild(this.playArena.firstChild);
-          }
+        }
     }
 
     clearTrumpArea() {
@@ -283,7 +287,6 @@ class GameScene {
         let trumpPileCard = pileCard.cloneNode();
         trumpPileCard.setAttribute('id', 'play-pile-card')
         trumpPileCard.addEventListener('click', function(){
-            console.log("Closed")
             gameScene.announceClosed();
         })
         this.cardPile.appendChild(trumpPileCard);
@@ -324,11 +327,11 @@ class GameScene {
         this.cardPile.innerHTML ='';
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
-        this.turnNumber = 0;
+        this.turnNumber = 1;
         this.updateRoundPoints(winner);
 
         let ownCards = this.hand.getElementsByClassName('card');
-        console.log(ownCards)
+        
         while(ownCards[0]) {
             ownCards[0].parentNode.removeChild(ownCards[0]);
         }
@@ -338,6 +341,8 @@ class GameScene {
         while(oppCards[0]) {
             oppCards[0].parentNode.removeChild(oppCards[0]);
         };
+
+        this.announce(winner.nickName + " печели раздаването")
        
     }
 
