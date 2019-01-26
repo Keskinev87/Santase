@@ -46,7 +46,6 @@ let cards =[{number: 1, suit: "clubs", name: "Nine", power: 0},
 io.on('connection', function(socket){
 
     console.log('a user connected');
-    console.log(socket.id);
 
     socket.on('host private room', function(data) {
         let room = new Room(roomCounter, data.gameCode);
@@ -82,8 +81,6 @@ io.on('connection', function(socket){
     
     socket.on('join game', function(nickName) {
          //if the player is not in another room
-         console.log("Socket rooms")
-         console.log(socket.rooms)
          if(Object.keys(socket.rooms).length <= 1){
            
             if(waitingRooms.length > 0) { //there are rooms with players waiting for another player to join
@@ -138,7 +135,6 @@ io.on('connection', function(socket){
     })
 
     socket.on('announcement', function(data){
-        console.log("Updating points from announcement")
         playingRooms[data.room][data.player].updatePoints(data.points, data.room);
         playingRooms[data.room].sendAnnouncement(data.player, data.points);
     })
@@ -200,7 +196,9 @@ class Room {
 
         this.playDeck = this.shuffleCards();
         this.trumpSuit = this.playDeck[12].suit;
-
+        console.log("Before deal cards")
+        console.log(player1.cards)
+        console.log(player2.cards)
         io.sockets.to(this.number).emit('deal trump card', this.playDeck[12]);
         for (let i = 0; i < 12; i++) {
             if(i % 2 == 1) {
@@ -218,6 +216,7 @@ class Room {
         this.nextCard += 12;
         bubbleSort(player1.cards, player1.cards.length);
         bubbleSort(player2.cards, player2.cards.length);
+        
         io.sockets.to(player1.id).emit('deal cards', player1.cards);
         io.sockets.to(player2.id).emit('deal cards', player2.cards);
         this.sendPlay(player1);
@@ -327,9 +326,7 @@ class Room {
 
     checkPoints(player) {
         let opponent = this.getOpponent(player.number);
-        console.log("I was called from announcement with: ")
-        console.log(player);
-
+        
         if(this.player1.points >= 66) {
                 this.endRound(self.player1, self.player2);
         } else if (this.player2.points >= 66) {
@@ -351,10 +348,6 @@ class Room {
         //set the cards for both players to undefined, so the next turn can be played
         winner.cardPlayed = undefined;
         loser.cardPlayed = undefined;
-
-        if(this.stage == 'initial'){
-            this.sendDrawCard(winner, loser); //send draw card event 
-        }
         
         //both players run out of cards - end the round
         if(winner.cards.length == 0 && loser.cards.length == 0) {
@@ -365,15 +358,25 @@ class Room {
                 this.endRound(this[winnerFromClosed], this[this.playerClosed]); //the player who closed didn't make 66
             }
             
+        } else if (this.stage == 'initial'){
+            console.log("Drawing cards");
+            this.sendDrawCard(winner, loser); //send draw card event 
+            this.turnNumber++;
+            this.sendPlay(winner);
+            this.sendWait(loser);
+        } else {
+            this.turnNumber++;
+            this.sendPlay(winner);
+            this.sendWait(loser);
         }
-        this.turnNumber++;
-        this.sendPlay(winner);
-        this.sendWait(loser);
+
+        
     }
 
     endRound(winner, loser){
-        console.log("Ending round with announcement")
-        console.log(winner, loser)
+        console.log("Last cards are")
+        console.log(winner.cards)
+        console.log(loser.cards)
         if(loser.number === this.playerClosed) {
             winner.roundPoints += 3; //the player who closed didn't make 66
         } else {
