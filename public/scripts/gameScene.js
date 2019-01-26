@@ -23,6 +23,7 @@ class GameScene {
         this.joinPrivateRoomBtn = document.getElementById('join-private-room');
         this.gameHostJoinForm = document.getElementById('game-host-join-form');
         this.setNickNameForm = document.getElementById('set-nickname-form');
+        this.stage = 'initial';
         this.turnNumber = 1;
         this.trumpChangeAllowed = false;
         this.trumpSuit;
@@ -302,6 +303,13 @@ class GameScene {
             oppCard.classList.add('played-card');
             this.playArena.appendChild(oppCard);
         })
+        if(this.stage === 'closed' || this.stage === 'pile-over')
+            this.subtractOpponentsCard();
+    }
+
+    subtractOpponentsCard(){
+        let oppCards = this.opponentHand.getElementsByClassName('opp-card');
+        oppCards[0].parentElement.removeChild(oppCards[0]);
     }
 
     updatePoints(data) {
@@ -322,12 +330,15 @@ class GameScene {
         }
     }
 
-    resetRound(winner) {
+    resetRound() {
         this.playArena.innerHTML='';
         this.cardPile.innerHTML ='';
         this.ownPoints.innerHTML = 0;
         this.oppPoints.innerHTML = 0;
+        this.stage='initial';
         this.turnNumber = 1;
+        this.trumpChangeAllowed = false;
+        this.trumpSuit = undefined;
 
         let ownCards = this.hand.getElementsByClassName('card');
         

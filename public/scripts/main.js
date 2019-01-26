@@ -75,6 +75,7 @@ function main () {
         })
 
         socket.on('clear trump', function(){
+            gameScene.stage='pile-over';
             gameScene.clearTrumpArea();
         })
 
@@ -83,7 +84,7 @@ function main () {
         })
 
         socket.on('end round', function(winner){
-            this.announce(winner.nickName + " печели раздаването")
+            gameScene.announce(winner.nickName + " печели раздаването")
             gameScene.updateRoundPoints(winner);
             gameScene.resetRound(winner);
         })

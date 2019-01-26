@@ -23,7 +23,7 @@ class Player {
     }
 
     swapTrumpCard() {
-        if(gameScene.turnNumber > 1) {
+        if(gameScene.turnNumber > 1 && !gameScene.playArena.hasChildNodes()) {
             let trumpCard = document.getElementsByClassName('trump-card')[0];
             let ownTrump = document.getElementById(this.swapCard.number);
     
@@ -87,20 +87,26 @@ class Player {
 
     disableOwnHand() {
         let ownCards = this.hand.getElementsByClassName('card');
+        let pileCard = document.getElementById('play-pile-card');
+
+        if(pileCard)
+            pileCard.classList.add("disabled-card");
+
         for (let ownCard of ownCards){
             ownCard.classList.add('disabled-card');
         } 
         this.hand.classList.add('disabled-hand')
-        if(gameScene.stage == 'initial') {
-            let pileCard = document.getElementById('play-pile-card');
-            pileCard.disabled = true;
-        }
+        
         //disables the player's hand (waiting for the opponent to play);
     }
 
     enableOwnHand(cardPlayed, stage) {
         //this method will activate only the cards that are allowed to be played.
         let ownCards = this.hand.getElementsByClassName('card');
+        let pileCard = document.getElementById('play-pile-card');
+
+        if(pileCard)
+            pileCard.classList.remove("disabled-card");
 
         if( this.playArena.hasChildNodes()){
             let allowedSuits = [];
