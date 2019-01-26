@@ -88,9 +88,13 @@ class Player {
     disableOwnHand() {
         let ownCards = this.hand.getElementsByClassName('card');
         let pileCard = document.getElementById('play-pile-card');
+        let trumpCard = document.getElementsByClassName('trump-card')[0];
 
         if(pileCard)
             pileCard.classList.add("disabled-card");
+        
+        if(trumpCard)
+            trumpCard.classList.add("disabled-card");
 
         for (let ownCard of ownCards){
             ownCard.classList.add('disabled-card');
@@ -104,9 +108,13 @@ class Player {
         //this method will activate only the cards that are allowed to be played.
         let ownCards = this.hand.getElementsByClassName('card');
         let pileCard = document.getElementById('play-pile-card');
+        let trumpCard = document.getElementsByClassName('trump-card')[0];
 
         if(pileCard)
             pileCard.classList.remove("disabled-card");
+
+        if(trumpCard)
+            trumpCard.classList.remove("disabled-card");
 
         if( this.playArena.hasChildNodes()){
             let allowedSuits = [];

@@ -60,6 +60,8 @@
         color: white;
         background: #34675C;
         text-align: center;
+        border: 1px solid white;
+        border-radius: 5px;
     }
 }
 

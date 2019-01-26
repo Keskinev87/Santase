@@ -50,6 +50,7 @@ io.on('connection', function(socket){
 
     socket.on('host private room', function(data) {
         let room = new Room(roomCounter, data.gameCode);
+
         socket.join(room.number);
         socket.curRoom = room.number;
         room.player1 = new Player(socket.id, 'player1', data.nickName);
@@ -66,7 +67,7 @@ io.on('connection', function(socket){
 
             gameRoom.player2 = new Player(socket.id, 'player2', data.nickName); //set the second player in the room
             privatePlayingRooms[data.gameCode] = gameRoom //move the room from waiting to playing
-            delete privateWaitingRooms[data.gameCode];
+            delete privateWaitingRooms[data.gameCode]; //delete the room, since both players left
             socket.join(gameRoom.number); //join the socket to the room's number
             socket.curRoom = gameRoom.number;
             gameRoom.sendJoinedRoomStatus('player2'); //send the number of the room to the front-end
@@ -137,7 +138,8 @@ io.on('connection', function(socket){
     })
 
     socket.on('announcement', function(data){
-        playingRooms[data.room][data.player].updatePoints(data.points);
+        console.log("Updating points from announcement")
+        playingRooms[data.room][data.player].updatePoints(data.points, data.room);
         playingRooms[data.room].sendAnnouncement(data.player, data.points);
     })
 
@@ -179,10 +181,8 @@ class Room {
     }
 
     startGame() {
-        
         this.nextPlayer = this.getRandBetween(1,2); //the player who will play first
-        this.nextPlayer == 1 ? this.dealCards(this.player1, this.player2) : this.dealCards(this.player2, this.player1)
-
+        this.nextPlayer == 1 ? this.dealCards(this.player1, this.player2) : this.dealCards(this.player2, this.player1);
     }
 
     shuffleCards(){
@@ -315,20 +315,30 @@ class Room {
             }
         } 
 
-        card1Wins? this.updatePoints(firstPlayer, card1.power + card2.power) : this.updatePoints(secondPlayer, card1.power + card2.power);
-
+        if(card1Wins) {
+            firstPlayer.updatePoints(card1.power + card2.power, this.number);
+            this.checkPoints(firstPlayer);
+        } else {
+            secondPlayer.updatePoints(card1.power + card2.power, this.number);
+            this.checkPoints(secondPlayer);
+        }
+        
     }
 
-    updatePoints(player, points) {
+    checkPoints(player) {
         let opponent = this.getOpponent(player.number);
+        console.log("I was called from announcement with: ")
+        console.log(player);
 
-        this[player.number].points += points;
-        
-        io.sockets.to(this.number).emit('update points', {player: player.number, points: this[player.number].points});
-        if(this[player.number].points >= 66) {
+        if(this.player1.points >= 66) {
             let self = this;
             setTimeout(function() {
-                self.endRound(player, self[opponent]);
+                self.endRound(self.player1, self.player2);
+            }, 1000);
+        } else if (this.player2.points >= 66) {
+            let self = this;
+            setTimeout(function() {
+                self.endRound(self.player2, self.player1);
             }, 1000);
         } else {
             let self = this;
@@ -368,6 +378,8 @@ class Room {
     }
 
     endRound(winner, loser){
+        console.log("Ending round with announcement")
+        console.log(winner, loser)
         if(loser.number === this.playerClosed) {
             winner.roundPoints += 3; //the player who closed didn't make 66
         } else {
@@ -502,8 +514,16 @@ class Player {
         this.gamePoints=0;
     }
 
-    updatePoints(points) {
+    updatePoints(points, roomNumber) {
+        console.log("Updating self points");
         this.points += points;
+        io.sockets.to(roomNumber).emit('update points', {player: this.number, points: this.points});
+        if(this.points >= 66) {
+            console.log("My points are over 66")
+            console.log("Calling check points with:")
+            console.log(this)
+            playingRooms[roomNumber].checkPoints(this);
+        }
     }
 }
 
