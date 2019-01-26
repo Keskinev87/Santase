@@ -16,10 +16,11 @@ class Player {
         card.classList.remove('card')
         card.classList.add('played-card');
         this.lastPlayedCardPos = Number(card.dataset.pos);
+        socket.emit('card played', {room: gameScene.room, card: id, player: this.playerNumber});
         this.checkForAnnouncement(id);
         this.playArena.appendChild(card);
         this.disableOwnHand();
-        socket.emit('card played', {room: gameScene.room, card: id, player: this.playerNumber});
+       
     }
 
     swapTrumpCard() {

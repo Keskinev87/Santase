@@ -9,6 +9,8 @@ function main () {
     player = new Player();
     socket = io();
     gameScene.resizeGame();
+    gameScene.onOrientationChange();
+
 
     //ADD EVENT LISTENERS TO THE ELEMENTS  
     gameScene.addEventListeners().then(() => {

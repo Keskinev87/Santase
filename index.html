@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   </head>
   <body>
+    <div class="block-screen" style="visibility: hidden" id="block-screen">Моля завъртете екрана</div>
+    
     <form class="menu-form" id="set-nickname-form" action="">
         <div class="form-field-nickname">
             <p>Въведете Вашето име:</p>
@@ -45,7 +47,7 @@
                 </div>
             </div>
             <div class="play-field text-center" id="play-field" >
-                <div class="announcement-container" id="announcement-container" style="visibility: hidden"><p id="announcement"></p></div>
+                <div class="announcement-container" id="announcement-container" style="visibility: hidden" onclick="gameScene.closeAnnouncement()"><p id="announcement"></p></div>
                 <div id="play-arena"></div>
                 <div id="card-pile">
                     

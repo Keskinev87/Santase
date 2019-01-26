@@ -35,6 +35,8 @@ class GameScene {
 
     addEventListeners() {
         return new Promise((resolve, reject) => {
+
+            window.addEventListener('orientationchange', this.onOrientationChange);
             
             document.addEventListener('click', function(e) {
                 
@@ -143,6 +145,11 @@ class GameScene {
         this.launchIntoFullscreen(document.documentElement);
         this.gameScene.style.visibility = '';
         this.menu.style.visibility = 'hidden';
+    }
+
+    closeAnnouncement() {
+        let announcementContainer = document.getElementById('announcement-container');
+        announcementContainer.style.visibility='hidden';
     }
 
     announce(message) {
@@ -416,6 +423,21 @@ class GameScene {
         })
         
      }
+
+     onOrientationChange() {
+        let blockScreen = document.getElementById('block-screen');
+        switch(window.orientation) {  
+            case 90:
+                blockScreen.style.visibility = '';
+                break;
+            case -90:
+                blockScreen.style.visibility = '';
+                break;
+            default:
+                blockScreen.style.visibility = 'hidden';
+                break; 
+        }
+    }
 
     resizeGame () {
         console.log("Resizing")

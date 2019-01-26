@@ -331,15 +331,9 @@ class Room {
         console.log(player);
 
         if(this.player1.points >= 66) {
-            let self = this;
-            setTimeout(function() {
-                self.endRound(self.player1, self.player2);
-            }, 1000);
+                this.endRound(self.player1, self.player2);
         } else if (this.player2.points >= 66) {
-            let self = this;
-            setTimeout(function() {
-                self.endRound(self.player2, self.player1);
-            }, 1000);
+                this.endRound(self.player2, self.player1);
         } else {
             let self = this;
             setTimeout(function(){
@@ -415,11 +409,13 @@ class Room {
         this.turnNumber = 0;
         this.stage = 'initial';
 
-        io.sockets.to(this.number).emit("end round", winner);
-        this.sendStatusMsg(`${winner.nickName} печели раздаването...`);
-        this.sendStatusMsg("Започва ново раздаване...");
-
         let self = this;
+        setTimeout(function(){
+            io.sockets.to(self.number).emit("end round", winner);
+            self.sendStatusMsg(`${winner.nickName} печели раздаването...`);
+            self.sendStatusMsg("Започва ново раздаване...");
+        }, 2000)
+
         setTimeout(function(){
             self.dealCards(winner, loser);
         }, 3000);
@@ -515,14 +511,13 @@ class Player {
     }
 
     updatePoints(points, roomNumber) {
-        console.log("Updating self points");
         this.points += points;
         io.sockets.to(roomNumber).emit('update points', {player: this.number, points: this.points});
+
         if(this.points >= 66) {
-            console.log("My points are over 66")
-            console.log("Calling check points with:")
-            console.log(this)
-            playingRooms[roomNumber].checkPoints(this);
+            let loser = playingRooms[roomNumber].getOpponent(this.number);
+            
+            playingRooms[roomNumber].endRound(this, playingRooms[roomNumber][loser]);
         }
     }
 }
