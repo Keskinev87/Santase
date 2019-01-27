@@ -27,6 +27,13 @@
         <button type="button" class="instructions-button" id="instructions-button">Инструкции и правила</button>
     </div>
 
+    <div class="menu" id="warning-text" style="visibility: hidden">
+        <p>ВНИМАНИЕ! В случай, че нямате опонент, с когото да тествате играта,
+            можете да я отворите в два отделни таба на браузъра.
+            Всеки от тях ще бъде третиран като различен играч.
+        </p>
+        <button class="submit-button" onclick="gameScene.showMenu();">Продължи</button>
+    </div>
     
     <form class="menu-form" id="game-host-join-form" style="visibility: hidden" action="">
         <button class="form-close-button" onclick="gameScene.closeForm(event);">X</button> 

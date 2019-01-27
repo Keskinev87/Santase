@@ -21,10 +21,20 @@ function main () {
         socket.on('status message', function(msg) {
             gameScene.displayStatusMsg(msg);
         })
+
+        socket.on('room hosted', function(data){
+            console.log("Room hosted");
+            console.log(data)
+            gameScene.room = data.roomNumber;
+            player.playerNumber = data.playerNumber;
+            gameScene.showGameScene();
+        })
     
         socket.on('room joined', function(data){
+            console.log("Room joined")
+            console.log(data)
             let opponentsNameHolder = document.getElementById('opp-name');
-            
+            gameScene.showGameScene();
             opponentsNameHolder.innerHTML = data.opponentsNickName;
             gameScene.room = data.roomNumber;
             player.playerNumber = data.playerNumber;
@@ -112,7 +122,11 @@ function main () {
                 gameScene.quitGame();
             }, 4000);
         })
-    
+        
+        socket.on('wrong room code', function(){
+            gameScene.displayRoomCodeError();
+        })
+
         socket.on('error', function(error) {
             window.alert(error);
         })

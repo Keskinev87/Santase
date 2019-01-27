@@ -53,11 +53,11 @@ class GameScene {
             })
 
             this.setNickNameForm.addEventListener('submit', function(event){
+                gameScene.launchIntoFullscreen(document.documentElement);
                 gameScene.setNickName(event);
             })
         
             this.gameJoinBtn.addEventListener('click', function() {
-                gameScene.showGameScene();
                 socket.emit('join game', player.nickName);
             })
 
@@ -89,11 +89,18 @@ class GameScene {
             player.nickName = nickName;
             nickNameHolder.innerHTML = nickName;
             this.setNickNameForm.style.visibility = 'hidden';
-            this.showMenu();
+            this.showWarningText();
         }
     }
 
+    showWarningText() {
+        let warningText = document.getElementById('warning-text');
+        warningText.style.visibility = '';
+    }
+
     showMenu(){
+        let warningText = document.getElementById('warning-text');
+        warningText.style.visibility = 'hidden';
         this.menu.style.visibility = '';
     }
 
@@ -111,10 +118,12 @@ class GameScene {
                if(!gameCode){
                     gameCodeErr.innerHTML = "Моля въведете кода на стаята!";
                     gameCodeErr.style.visibility = '';
-               } 
-               gameScene.showGameScene();
-               socket.emit('host private room', {nickname: player.nickName, gameCode: gameCode});
-               console.log(player.nickName, gameCode);
+               } else {
+                    socket.emit('host private room', {nickName: player.nickName, gameCode: gameCode});
+                    console.log(player.nickName, gameCode);
+               }
+               
+               
            })
         } else if(mode === 'join') {
             this.gameHostJoinForm.addEventListener('submit', function(event){
@@ -126,7 +135,7 @@ class GameScene {
                         gameCodeErr.innerHTML = "Моля въведете кода на стаята";
                         gameCodeErr.style.visibility = '';
                 } 
-                gameScene.showGameScene();
+            
                 socket.emit('join private room', {nickName: player.nickName, gameCode: gameCode});
                 console.log(player.nickName, gameCode);
             })
@@ -134,17 +143,24 @@ class GameScene {
         
     }
 
+    displayRoomCodeError(){
+        let gameCodeErr = document.getElementById('roomcode-error');
+        gameCodeErr.innerHTML = "Кодът е грешен или не съществува";
+        gameCodeErr.style.visibility = '';
+    }
+
     closeForm(e) {
         e.preventDefault();
+
         this.gameHostJoinForm.style.visibility = "hidden";
         this.menu.style.visibility = "";
     }
 
 
     showGameScene() {
-        this.launchIntoFullscreen(document.documentElement);
-        this.gameScene.style.visibility = '';
+        this.gameHostJoinForm.style.visibility = 'hidden';
         this.menu.style.visibility = 'hidden';
+        this.gameScene.style.visibility = '';
     }
 
     closeAnnouncement() {

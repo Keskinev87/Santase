@@ -15,7 +15,7 @@ let roomCounter = 1;
 let waitingRooms = []; //the rooms with waiting players
 let playingRooms = {}; //the rooms with coupled players, who are playing - HASHTABLE
 let privateWaitingRooms = {};
-let privatePlayingRooms = {};
+
 
 let cards =[{number: 1, suit: "clubs", name: "Nine", power: 0},
     {number: 2, suit: "clubs", name: "Jack", power: 2},
@@ -48,34 +48,41 @@ io.on('connection', function(socket){
     console.log('a user connected');
 
     socket.on('host private room', function(data) {
-        let room = new Room(roomCounter, data.gameCode);
-
+        let room = new Room(Number(data.gameCode), data.gameCode);
+   
         socket.join(room.number);
         socket.curRoom = room.number;
         room.player1 = new Player(socket.id, 'player1', data.nickName);
-        room.sendJoinedRoomStatus('player1');
+        room.sendHostedRoomStatus('player1');
         room.sendStatusMsg('Изчакване на друг играч...')
-        privateWaitingRooms[data.gameCode] = room;
+        privateWaitingRooms[room.number] = room;
+        console.log("First player check")
+        console.log(data)
+        console.log(room.player1)
         roomCounter++;
     })
 
     socket.on('join private room', function(data){
-        
+
         if(privateWaitingRooms[data.gameCode] !== undefined) {
             let gameRoom = privateWaitingRooms[data.gameCode];
 
             gameRoom.player2 = new Player(socket.id, 'player2', data.nickName); //set the second player in the room
-            privatePlayingRooms[data.gameCode] = gameRoom //move the room from waiting to playing
-            delete privateWaitingRooms[data.gameCode]; //delete the room, since both players left
+           
             socket.join(gameRoom.number); //join the socket to the room's number
             socket.curRoom = gameRoom.number;
             gameRoom.sendJoinedRoomStatus('player2'); //send the number of the room to the front-end
             gameRoom.sendStatusMsg(gameRoom.player2.nickName + ' joined'); //let the players know, that the second player has joined
             gameRoom.sendStatusMsg('Играта започва...'); //let the players know when the game will start
-                
+
+            playingRooms[gameRoom.number] = gameRoom //move the room from waiting to playing
+            delete privateWaitingRooms[data.gameCode]; //delete the room, since both players left
+            
             setTimeout(function() {
                 gameRoom.startGame();
             }, 1000); //start the game
+        } else {
+            io.sockets.to(socket.id).emit('wrong room code');
         }
     })
     
@@ -106,7 +113,7 @@ io.on('connection', function(socket){
                 socket.curRoom = room.number;
                 room.player1 = new Player(socket.id, 'player1', nickName);
     
-                room.sendJoinedRoomStatus('player1');
+                room.sendHostedRoomStatus('player1');
                 room.sendStatusMsg('Изчакване за друг играч...')
                 waitingRooms.unshift(room);
                 roomCounter++;
@@ -151,8 +158,12 @@ io.on('connection', function(socket){
 
     socket.on('disconnect', function() {
         io.sockets.to(socket.curRoom).emit('player left', "the player has left");
-        delete playingRooms[socket.curRoom];
-        
+        if(playingRooms[socket.curRoom])
+            delete playingRooms[socket.curRoom];
+        else if(privateWaitingRooms[socket.curRoom])
+            delete privateWaitingRooms[socket.curRoom];
+        else
+            waitingRooms.pop();
     })
 
     socket.on('leave room', function(room) {
@@ -196,9 +207,7 @@ class Room {
 
         this.playDeck = this.shuffleCards();
         this.trumpSuit = this.playDeck[12].suit;
-        console.log("Before deal cards")
-        console.log(player1.cards)
-        console.log(player2.cards)
+    
         io.sockets.to(this.number).emit('deal trump card', this.playDeck[12]);
         for (let i = 0; i < 12; i++) {
             if(i % 2 == 1) {
@@ -359,7 +368,7 @@ class Room {
             }
             
         } else if (this.stage == 'initial'){
-            console.log("Drawing cards");
+            
             this.sendDrawCard(winner, loser); //send draw card event 
             this.turnNumber++;
             this.sendPlay(winner);
@@ -374,9 +383,7 @@ class Room {
     }
 
     endRound(winner, loser){
-        console.log("Last cards are")
-        console.log(winner.cards)
-        console.log(loser.cards)
+      
         if(loser.number === this.playerClosed) {
             winner.roundPoints += 3; //the player who closed didn't make 66
         } else {
@@ -489,15 +496,23 @@ class Room {
         io.sockets.to(this.number).emit('status message', msg);
     }
 
+    sendHostedRoomStatus(player) {
+        io.sockets.to(this[player].id).emit('room hosted', {roomNumber: this.number, playerNumber: player, opponentsNickName: ''});
+    }
+
     sendJoinedRoomStatus(player) {
         let opponent = this.getOpponent(player);
-        if (this[opponent]){
-            io.sockets.to(this[player].id).emit('room joined', {roomNumber: this.number, playerNumber: player, opponentsNickName: this[opponent].nickName});
-            io.sockets.to(this[opponent].id).emit('room joined', {roomNumber: this.number, playerNumber: opponent, opponentsNickName: this[player].nickName});
-        }   
-        else
-            io.sockets.to(this[player].id).emit('room joined', {roomNumber: this.number, playerNumber: player, opponentsNickName: ''});
+        console.log("Sending joined")
+        console.log(this[opponent])
+        console.log(this[player])
+        io.sockets.to(this[player].id).emit('room joined', {roomNumber: this.number, playerNumber: player, opponentsNickName: this[opponent].nickName});
+        io.sockets.to(this[opponent].id).emit('room joined', {roomNumber: this.number, playerNumber: opponent, opponentsNickName: this[player].nickName});
+        
+        
+            
     }
+
+   
         
 }
 
