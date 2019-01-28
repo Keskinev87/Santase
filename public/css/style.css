@@ -213,7 +213,7 @@ body {
     left:     50%;
     top:      50%;
     background-color: #C6D166;
-    background-image: linear-gradient(#C6D166, #5C821A, #C6D166);
+    background-image: linear-gradient(#C6D166, #5C821A, #5C821A, #C6D166);
     border: 5px solid #0F1B07;
     border-radius: 20px;
     box-sizing: border-box;
